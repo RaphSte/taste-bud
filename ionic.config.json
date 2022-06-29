@@ -1,0 +1,7 @@
+{
+  "name": "taste-bud",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue"
+}

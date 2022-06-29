@@ -13,6 +13,7 @@
 <script lang="ts">
 import VueApexCharts from "vue3-apexcharts";
 import {defineComponent} from "vue";
+import {getColors} from "@/util/Color";
 
 export default defineComponent({
   name: "BarChart",
@@ -34,12 +35,14 @@ export default defineComponent({
     //TODO replace with capacitor logic?
     const darkThemeMq = window.matchMedia("(prefers-color-scheme: dark)");
     const theme = darkThemeMq.matches ? 'dark' : 'light'
+    const colors = getColors()
+
     return {
       chartOptions: {
         theme: {
           mode: theme,
         },
-        colors: ['#eec292', '#1ba07d', '#19383a'],
+        colors: [colors.primary, colors.success, colors.warning],
         chart: {
           height: this.height,
           type: 'bar',
@@ -59,7 +62,7 @@ export default defineComponent({
           offsetY: -20,
           style: {
             fontSize: '12px',
-            colors: ["#a8a8a8"]
+            colors: [theme == 'light' ? colors.dark : colors.light],
           },
           formatter: (value: any) => {
             return Math.round((value + Number.EPSILON) * 100) / 100

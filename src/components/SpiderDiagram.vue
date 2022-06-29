@@ -13,6 +13,7 @@
 <script lang="ts">
 import VueApexCharts from "vue3-apexcharts";
 import {defineComponent} from "vue";
+import {getColors} from "@/util/Color";
 
 export default defineComponent({
   name: "SpiderDiagram",
@@ -34,6 +35,7 @@ export default defineComponent({
     //TODO replace with capacitor logic?
     const darkThemeMq = window.matchMedia("(prefers-color-scheme: dark)");
     const theme = darkThemeMq.matches ? 'dark' : 'light'
+    const colors = getColors()
 
     return {
       chartOptions: {
@@ -60,7 +62,7 @@ export default defineComponent({
         stroke: {
           width: 2
         },
-        colors: ['#eec292', '#1ba07d', '#19383a'],
+        colors: [colors.primary, colors.success, colors.warning],
         fill: {
           opacity: 0.2,
         },

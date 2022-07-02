@@ -2,7 +2,7 @@
 
   <div id="chart">
     <apexchart
-        height="350"
+        :height="height + 'px'"
         type="radar"
         :options="chartOptions"
         :series="series"
@@ -17,6 +17,8 @@ import VueApexCharts from "vue3-apexcharts";
 export default {
   name: "SpiderDiagram",
   props: {
+    title: String,
+    height: Number,
     categories: [],
     seriesData: [],
   },
@@ -30,7 +32,7 @@ export default {
       series: this.seriesData,
       chartOptions: {
         chart: {
-          height: 350,
+          height: this.height,
           type: 'radar',
           dropShadow: {
             enabled: true,

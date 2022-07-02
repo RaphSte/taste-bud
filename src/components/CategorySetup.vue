@@ -1,16 +1,6 @@
 <template>
   <ion-page>
-    <ion-header>
-      <ion-toolbar>
-        <ion-title>Tab 3</ion-title>
-      </ion-toolbar>
-    </ion-header>
     <ion-content :fullscreen="true">
-      <ion-header collapse="condense">
-        <ion-toolbar>
-          <ion-title size="large">Tab 3</ion-title>
-        </ion-toolbar>
-      </ion-header>
       <div id="chart">
         <SpiderDiagram
             title="Preview"
@@ -32,16 +22,14 @@
 </template>
 
 <script lang="js">
-import {defineComponent} from 'vue';
-import {IonPage, IonHeader, IonToolbar, IonTitle, IonContent} from '@ionic/vue';
+import {defineComponent} from "vue";
+import SpiderDiagram from "@/components/SpiderDiagram";
 import CategoryInputHandler from "@/components/CategoryInputHandler";
-import SpiderDiagram from '@/components/SpiderDiagram.vue';
 
 
 export default defineComponent({
-
-  name: 'Tab3Page',
-  components: {SpiderDiagram, IonHeader, IonToolbar, IonTitle, IonContent, IonPage, CategoryInputHandler},
+  name: "CategorySetup",
+  components: {SpiderDiagram, CategoryInputHandler},
   data() {
     return {
       rerenderTimer: undefined,//intentional undefined
@@ -49,14 +37,18 @@ export default defineComponent({
       categories: ['cat0', 'cat1', 'cat2'],
       series: [{
         name: 'Series 1',
-        data: [8, 5, 3, 4, 1, 2],
-      }, {
-        name: 'Series 2',
-        data: [20, 30, 40, 80, 20, 80],
-      }, {
-        name: 'Series 3',
-        data: [44, 76, 78, 13, 43, 10],
-      }]
+        data: [5, 6, 7],
+      }],
+      // series: [{
+      //   name: 'Series 1',
+      //   data: [8, 5, 3, 4, 1, 2],
+      // }, {
+      //   name: 'Series 2',
+      //   data: [20, 30, 40, 80, 20, 80],
+      // }, {
+      //   name: 'Series 3',
+      //   data: [44, 76, 78, 13, 43, 10],
+      // }]
     }
   },
   methods: {
@@ -81,3 +73,6 @@ export default defineComponent({
 
 });
 </script>
+<style scoped>
+
+</style>

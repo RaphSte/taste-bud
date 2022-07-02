@@ -4,20 +4,15 @@
     <button @click="this.$emit('category-removed')"> -</button>
     <button @click="this.$emit('category-added')"> +</button>
   </div>
-  <div>
-    <p>category count: {{ categories.length }}</p>
-    <p>category count: {{ categories }}</p>
-  </div>
   <div v-for="(category, index) in categories" :key="index">
     <input
         :value="category"
         @input="e => this.$emit('category-rename', {name: e.target.value, index: index})"
     >
-    <p>{{ index }}</p>
   </div>
 </template>
 
-<script lang="js">
+<script lang="ts">
 export default {
   name: "CategoryInputHandler",
   props: {

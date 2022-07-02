@@ -2,16 +2,16 @@
   <ion-page>
     <ion-header>
       <ion-toolbar>
-        <ion-title>Tab 1</ion-title>
+        <ion-title>Setup</ion-title>
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">
       <ion-header collapse="condense">
         <ion-toolbar>
-          <ion-title size="large">Tab 1</ion-title>
+          <ion-title size="large">How to use</ion-title>
         </ion-toolbar>
       </ion-header>
-    
+      <p>blabla, fill in da things</p>
       <ExploreContainer name="Tab 1 page" />
     </ion-content>
   </ion-page>

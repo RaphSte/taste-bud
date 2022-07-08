@@ -31,10 +31,10 @@
   </ion-page>
 </template>
 
-<script lang="js">
+<script lang="ts">
 import {defineComponent} from 'vue';
 import {IonPage, IonHeader, IonToolbar, IonTitle, IonContent} from '@ionic/vue';
-import CategoryInputHandler from "@/components/CategoryInputHandler";
+import CategoryInputHandler from "@/components/CategoryInputHandler.vue";
 import SpiderDiagram from '@/components/SpiderDiagram.vue';
 
 

@@ -21,10 +21,10 @@
   </ion-page>
 </template>
 
-<script lang="js">
+<script lang="ts">
 import {defineComponent} from "vue";
-import SpiderDiagram from "@/components/SpiderDiagram";
-import CategoryInputHandler from "@/components/CategoryInputHandler";
+import SpiderDiagram from "@/components/SpiderDiagram.vue";
+import CategoryInputHandler from "@/components/CategoryInputHandler.vue";
 
 
 export default defineComponent({
@@ -39,16 +39,6 @@ export default defineComponent({
         name: 'Series 1',
         data: [5, 6, 7],
       }],
-      // series: [{
-      //   name: 'Series 1',
-      //   data: [8, 5, 3, 4, 1, 2],
-      // }, {
-      //   name: 'Series 2',
-      //   data: [20, 30, 40, 80, 20, 80],
-      // }, {
-      //   name: 'Series 3',
-      //   data: [44, 76, 78, 13, 43, 10],
-      // }]
     }
   },
   methods: {
@@ -60,7 +50,7 @@ export default defineComponent({
       this.categories.push('');
       this.series[0].data.push(Math.floor(Math.random() * 11)) //random number between 0 and 10 for each new category
     },
-    handleCategoryRename(event) {
+    handleCategoryRename(event: any) {
       this.categories[event.index] = event.name;
 
       clearTimeout(this.rerenderTimer)

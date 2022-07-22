@@ -32,7 +32,7 @@ export default defineComponent({
   components: {SpiderDiagram, CategoryInputHandler},
   data() {
     return {
-      rerenderTimer: undefined,//intentional undefined
+      rerenderTimer: 0,//intentional undefined
       spiderDiagramUpdate: 0, //neat trick to make the diagram update when this key changes
       categories: ['cat0', 'cat1', 'cat2'],
       series: [{

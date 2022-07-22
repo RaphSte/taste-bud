@@ -33,8 +33,9 @@
 <script lang="ts">
 import ConfigHeader from "@/components/ConfigHeader.vue";
 import SetupInput from "@/components/SetupInput.vue";
+import {defineComponent} from 'vue'
 
-export default {
+export default defineComponent ({
   name: "SessionConfig",
   components: {SetupInput, ConfigHeader},
   data() {
@@ -49,11 +50,11 @@ export default {
     },
     handleSessionKeyInput(event: any){
       console.log(event)
-      this.stepCount++
+      this.stepCount++;
       this.sessionKey = event.inputValue
     }
   },
-}
+})
 </script>
 
 <style scoped>

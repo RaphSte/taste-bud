@@ -44,7 +44,7 @@ export default defineComponent({
   components: {SpiderDiagram, IonHeader, IonToolbar, IonTitle, IonContent, IonPage, CategoryInputHandler},
   data() {
     return {
-      rerenderTimer: undefined,//intentional undefined
+      rerenderTimer: 0,//intentional undefined
       spiderDiagramUpdate: 0, //neat trick to make the diagram update when this key changes
       categories: ['cat0', 'cat1', 'cat2'],
       series: [{
@@ -68,7 +68,7 @@ export default defineComponent({
       this.categories.push('');
       this.series[0].data.push(Math.floor(Math.random() * 11)) //random number between 0 and 10 for each new category
     },
-    handleCategoryRename(event) {
+    handleCategoryRename(event: any) {
       this.categories[event.index] = event.name;
 
       clearTimeout(this.rerenderTimer)

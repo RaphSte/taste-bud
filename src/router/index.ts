@@ -2,11 +2,13 @@ import { createRouter, createWebHistory } from '@ionic/vue-router';
 import { RouteRecordRaw } from 'vue-router';
 import TabsPage from '../views/TabsPage.vue'
 import ConfigPage from '../views/ConfigPage.vue'
+import HomeScreen from "@/views/HomeScreen.vue";
+
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
-    redirect: '/tabs/tab1'
+    component: HomeScreen
   },
   {
     path: '/config/',

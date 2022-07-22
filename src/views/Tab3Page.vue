@@ -44,7 +44,7 @@ export default defineComponent({
   components: {SpiderDiagram, IonHeader, IonToolbar, IonTitle, IonContent, IonPage, CategoryInputHandler},
   data() {
     return {
-      rerenderTimer: 0,//intentional undefined
+      rerenderTimer: 0,
       spiderDiagramUpdate: 0, //neat trick to make the diagram update when this key changes
       categories: ['cat0', 'cat1', 'cat2'],
       series: [{

@@ -5,9 +5,9 @@
         :value="inputValue"
         :placeholder="inputValue !== ''  ? inputValue :placeHolder"
         v-model="sessionName"
+        @input="handleInput"
     ></ion-input>
     <!--    TODO: set value of ion input to input value if exists. find out why this is not working -->
-    <ion-button @click="this.$emit('next-pressed', {inputValue: sessionName})">Next</ion-button>
   </ion-item>
 </template>
 
@@ -23,9 +23,22 @@ export default defineComponent({
     placeHolder: String,
     inputValue: String,
   },
+  data(){
+    return {
+      rerenderTimer: 0,
+    }
+  },
   setup() {
     return {
       sessionName: ""
+    }
+  },
+  methods: {
+    handleInput(){ //this is a workaround to deal with the performance issues of emitting events
+      clearTimeout(this.rerenderTimer)
+      this.rerenderTimer = setTimeout(() => {
+        this.$emit('setup-input-registered', {inputValue: this.sessionName})
+      }, 100);
     }
   }
 })

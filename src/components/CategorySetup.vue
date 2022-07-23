@@ -9,13 +9,16 @@
             :series-data="series"
             :key="spiderDiagramUpdate"
         />
-        <category-input-handler
-            :categories="categories"
-            @category-removed="handleCategoryRemoved"
-            @category-added="handleCategoryAdded"
-            @category-rename="handleCategoryRename"
-        />
+        <div class="category-input-handler">
+          <category-input-handler
+              :categories="categories"
+              @category-removed="handleCategoryRemoved"
+              @category-added="handleCategoryAdded"
+              @category-rename="handleCategoryRename"
+          />
+        </div>
         <p>{{ categories }}</p>
+        <p>{{ series }}</p>
       </div>
     </ion-content>
   </ion-page>
@@ -42,9 +45,9 @@ export default defineComponent({
     }
   },
   methods: {
-    handleCategoryRemoved() {
-      this.categories.pop();
-      this.series[0].data.pop()
+    handleCategoryRemoved(index: number) {
+      this.categories.splice(index, 1);
+      this.series[0].data.splice(index, 1);
     },
     handleCategoryAdded() {
       this.categories.push('');
@@ -64,5 +67,7 @@ export default defineComponent({
 });
 </script>
 <style scoped>
-
+.category-input-handler {
+  overflow-y: scroll;
+}
 </style>

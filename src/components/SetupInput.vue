@@ -2,30 +2,33 @@
   <ion-item>
     <ion-label position="stacked">{{ labelText }}</ion-label>
     <ion-input
+        :value="inputValue"
         :placeholder="inputValue !== ''  ? inputValue :placeHolder"
-        v-model="inputString"
-        @input="console.log(this.inputString)"
+        v-model="sessionName"
     ></ion-input>
-
-        <ion-button @click="this.$emit('next-pressed', {inputValue: inputString})">Next</ion-button>
+    <!--    TODO: set value of ion input to input value if exists. find out why this is not working -->
+    <ion-button @click="this.$emit('next-pressed', {inputValue: sessionName})">Next</ion-button>
   </ion-item>
 </template>
 
-<script lang="js">
-export default {
+<script lang="ts">
+import {defineComponent} from "vue";
+import {IonInput} from "@ionic/vue";
+
+export default defineComponent({
   name: "SetupInput",
+  components: {IonInput}, //import component to have v-model work
   props: {
     labelText: String,
     placeHolder: String,
     inputValue: String,
   },
-  setup(){
+  setup() {
     return {
-      inputString: ""
+      sessionName: ""
     }
   }
-
-}
+})
 </script>
 
 <style scoped>

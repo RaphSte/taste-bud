@@ -1,6 +1,12 @@
 <template>
   <ion-page>
-    <config-header :current-step="stepCount" :target-step="3"/>
+    <config-header
+        :previous-step="previousStep"
+        :current-step="stepCount"
+        :key="stepCount"
+        :target-step="3"
+        @header-back-pressed="handleHeaderBackPressed"
+    />
     <ion-content :fullscreen="true">
       <ion-header collapse="condense">
         <ion-toolbar>
@@ -8,24 +14,16 @@
         </ion-toolbar>
       </ion-header>
 
-
       <setup-input
-      v-if="stepCount === 0"
-      label-text="Enter a session Key"
-      place-holder="WhiskeyTasing 2022"
-      :input-value="sessionKey"
-      @next-pressed="handleSessionKeyInput"
+          v-if="stepCount === 1"
+          label-text="Name Your Event"
+          place-holder="WhiskeyTasing 2022"
+          :input-value="sessionKey"
+          @next-pressed="handleSessionKeyInput"
       />
 
-<!--      <input-->
-<!--          v-if="stepCount === 0"-->
-<!--          v-model="sessionKey"-->
-<!--      >-->
 
-      <p>child0: hold state in this view and change child components </p>
-      <p>sessionKey: {{sessionKey}}</p>
-      <button @click="stepCount--">back</button>
-      <button @click="stepCount++">next</button>
+      <p>sessionKey: {{ sessionKey }}</p>
     </ion-content>
   </ion-page>
 </template>
@@ -34,14 +32,19 @@
 import ConfigHeader from "@/components/ConfigHeader.vue";
 import SetupInput from "@/components/SetupInput.vue";
 import {defineComponent} from 'vue'
+import router from "@/router";
 
-export default defineComponent ({
+export default defineComponent({
   name: "SessionConfig",
   components: {SetupInput, ConfigHeader},
   data() {
     return {
-      stepCount: 0,
+      stepCount: 1,
       sessionKey: "",
+      step0Name: "Home",
+      step1Name: "Naming",
+      step2Name: "Diagram",
+      previousStep: "Home"
     }
   },
   methods: {
@@ -49,9 +52,26 @@ export default defineComponent ({
       this.stepCount = 0;
     },
     handleSessionKeyInput(event: any){
-      console.log(event)
       this.stepCount++;
+      this.previousStep = this.getPreviousStepNameByCount(this.stepCount)
       this.sessionKey = event.inputValue
+    },
+    handleHeaderBackPressed() {
+      if (this.stepCount === 1) {
+        router.back()
+      } else {
+        this.stepCount--;
+        this.previousStep = this.getPreviousStepNameByCount(this.stepCount)
+      }
+    },
+    getPreviousStepNameByCount(stepCount: number): string{
+      switch (stepCount){
+        case 1: return this.step0Name;
+        case 2: return this.step1Name;
+        case 3: return this.step2Name;
+        default: return "defaultStep"
+      }
+
     }
   },
 })

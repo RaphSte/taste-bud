@@ -29,6 +29,12 @@
           :saved-categories="categories"
       />
 
+      <preview-component
+          v-if="stepCount === 3"
+          :sessionName="sessionKey"
+          :categories="categories"
+      />
+
       <ion-button @click="stepCount++">Next</ion-button>
       <p>sessionKey: {{ sessionKey }}</p>
       <p>categories: {{ categories }}</p>
@@ -43,10 +49,11 @@ import SetupInput from "@/components/SetupInput.vue";
 import {defineComponent} from 'vue'
 import router from "@/router";
 import CategorySetup from "@/components/CategorySetup.vue";
+import PreviewComponent from "@/components/PreviewComponent.vue";
 
 export default defineComponent({
   name: "SessionConfig",
-  components: {CategorySetup, SetupInput, ConfigHeader},
+  components: {PreviewComponent, CategorySetup, SetupInput, ConfigHeader},
   data() {
     return {
       stepCount: 1, //starting at 1 for better readability
@@ -54,6 +61,7 @@ export default defineComponent({
       step0Name: "Home",
       step1Name: "Naming",
       step2Name: "Diagram",
+      step3Name: "Overview",
       previousStepName: "Home",
       categories: [],
     }
@@ -80,6 +88,8 @@ export default defineComponent({
           return this.step1Name;
         case 2:
           return this.step2Name;
+        case 3:
+          return this.step3Name;
         default:
           return "defaultStep"
       }

@@ -24,11 +24,15 @@
       />
 
       <category-setup
-          v-if="stepCount===2"
+          v-if="stepCount === 2"
+          @diagram-categories-emitted="handleCategoriesEmitted"
+          :saved-categories="categories"
       />
 
       <ion-button @click="stepCount++">Next</ion-button>
       <p>sessionKey: {{ sessionKey }}</p>
+      <p>categories: {{ categories }}</p>
+
     </ion-content>
   </ion-page>
 </template>
@@ -45,12 +49,13 @@ export default defineComponent({
   components: {CategorySetup, SetupInput, ConfigHeader},
   data() {
     return {
-      stepCount: 1,
+      stepCount: 1, //starting at 1 for better readability
       sessionKey: "",
       step0Name: "Home",
       step1Name: "Naming",
       step2Name: "Diagram",
-      previousStepName: "Home"
+      previousStepName: "Home",
+      categories: [],
     }
   },
   methods: {
@@ -63,6 +68,9 @@ export default defineComponent({
     },
     handleSetupInput(event: any) {
       this.sessionKey = event.inputValue;
+    },
+    handleCategoriesEmitted(event: any) {
+      this.categories = event.categories;
     },
     getStepNameByCount(stepCount: number): string {
       switch (stepCount) {

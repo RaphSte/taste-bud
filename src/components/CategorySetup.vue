@@ -8,6 +8,10 @@
         :key="spiderDiagramUpdate"
     />
     <div class="category-input-handler">
+      <!--
+      TODO: check if the infinite scroll component can handle the scrolling better: https://ionicframework.com/docs/api/infinite-scroll
+      maybe the virtual scroll too: https://ionicframework.com/docs/api/virtual-scroll
+      -->
       <category-input-handler
           :categories="categories"
           @category-removed="handleCategoryRemoved"
@@ -34,18 +38,20 @@ export default defineComponent({
   data() {
 
     let categories: string[] = [];
-
-    if (Array.isArray(this.savedCategories) && this.savedCategories !== undefined && this.savedCategories.length > 0) {
+    if (Array.isArray(this.savedCategories)) {
       categories = this.savedCategories;
-    } else {
+    }
+
+    if (categories.length === 0) { //workaround -> TODO: figure out how to assign types to props
       for (let i = 0; i < 3; i++) {
         categories.push(this.getRandomCategoryName());
       }
     }
 
+    let dataArray: number[] = []; //workaround to have a type definition within the object
     let sampleSeries = [{
       name: 'Series 1',
-      data: [],
+      data: dataArray
     }];
 
     categories.forEach(() => {

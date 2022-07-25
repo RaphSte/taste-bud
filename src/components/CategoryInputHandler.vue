@@ -7,6 +7,7 @@
         <ion-input
             :value="category"
             @input="e => this.$emit('category-rename', {name: e.target.value, index: index})"
+            :placeholder="sampleCategoryNames[index % sampleCategoryNames.length]"
         ></ion-input>
         <ion-label color="primary"/>
         <ion-button color="light" @click="this.$emit('category-removed', index)">
@@ -16,7 +17,7 @@
     </div>
   </div>
   <div id="container" class="ion-text-center">
-    <ion-button color="secondary" class="add-category-button" @click="this.$emit('category-added')">
+    <ion-button shape="round" color="secondary" class="add-category-button" @click="this.$emit('category-added')">
       <ion-icon :icon="addOutline"/>
     </ion-button>
   </div>
@@ -39,7 +40,12 @@ export default {
       closeOutline,
       addOutline,
     }
-  }
+  },
+  data() {
+    return {
+      sampleCategoryNames: ['sweet', 'salty', 'sour', 'smokey', 'flowery', 'bitter', 'funny', 'hot', 'spicy', 'okay'],
+    }
+  },
 }
 </script>
 

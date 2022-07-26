@@ -18,6 +18,11 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: 'session-config',
         component: () => import('@/views/SessionConfig.vue')
+      },
+      {
+        path: 'success',
+        component: () => import('@/views/SubmitSuccess.vue'),
+        props: (route) => ({ tastingSessionCode: route.query.tastingSessionCode }),
       }
     ]
   },

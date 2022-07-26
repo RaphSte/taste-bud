@@ -35,26 +35,44 @@
           :categories="categories"
       />
 
-      <ion-button @click="stepCount++">Next</ion-button>
+      <ion-button
+          v-if="stepCount < 3"
+          @click="stepCount++">Next
+      </ion-button>
+      <ion-button
+          v-if="stepCount === 3"
+          @click="submitSessionConfig">Submit
+      </ion-button>
       <p>sessionKey: {{ sessionKey }}</p>
       <p>categories: {{ categories }}</p>
 
     </ion-content>
   </ion-page>
+  <ion-loading
+      :is-open="isOpenRef"
+      message="Please wait..."
+      :duration="timeout"
+      @didDismiss="setOpen(false)"
+  >
+  </ion-loading>
 </template>
 
 <script lang="ts">
 import ConfigHeader from "@/components/ConfigHeader.vue";
 import SetupInput from "@/components/SetupInput.vue";
-import {defineComponent} from 'vue'
+import {defineComponent, ref} from 'vue'
 import router from "@/router";
 import CategorySetup from "@/components/CategorySetup.vue";
-import PreviewComponent from "@/components/PreviewComponent.vue";
+import PreviewComponent from "@/components/ConfigOverview.vue";
+import {TastingSessionConfigurationModel} from "@/types/TastingSessionConfiguration";
+import {createTastingSession} from "@/controller/TastingSession";
+import {IonLoading} from "@ionic/vue";
 
 export default defineComponent({
   name: "SessionConfig",
-  components: {PreviewComponent, CategorySetup, SetupInput, ConfigHeader},
+  components: {PreviewComponent, CategorySetup, SetupInput, ConfigHeader, IonLoading},
   data() {
+    let categories: string[] = [];
     return {
       stepCount: 1, //starting at 1 for better readability
       sessionKey: "",
@@ -63,8 +81,15 @@ export default defineComponent({
       step2Name: "Diagram",
       step3Name: "Overview",
       previousStepName: "Home",
-      categories: [],
+      categories,
+      timeout: 0, //run forever
     }
+  },
+  setup() {
+    const isOpenRef = ref(false);
+    const setOpen = (state: boolean) => isOpenRef.value = state;
+
+    return {isOpenRef, setOpen}
   },
   methods: {
     handleHeaderBackPressed() {
@@ -93,7 +118,24 @@ export default defineComponent({
         default:
           return "defaultStep"
       }
-    }
+    },
+    submitSessionConfig() {
+      this.setOpen(true)
+      let sessionConfig: TastingSessionConfigurationModel = {
+        sessionKey: this.sessionKey,
+        creatorId: "asd",
+        categories: this.categories
+      }
+
+      createTastingSession(sessionConfig).then((sessionKey) => {
+        //TODO find out why there are some old components leftover
+        this.$router.push(`/config/success?tastingSessionCode=${sessionKey}`);
+      }).catch((error) => {
+        //TODO error handling
+        console.log(error)
+      });
+
+    },
   },
 })
 </script>

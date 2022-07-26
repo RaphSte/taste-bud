@@ -33,19 +33,19 @@ export default defineComponent({
   name: "CategorySetup",
   components: {SpiderDiagram, CategoryInputHandler},
   props: {
-    savedCategories: [],
+    savedCategories: {type: Array<string>},
   },
   data() {
 
     let categories: string[] = [];
-    if (Array.isArray(this.savedCategories)) {
-      categories = this.savedCategories;
-    }
 
-    if (categories.length === 0) { //workaround -> TODO: figure out how to assign types to props
+
+    if (this.savedCategories == undefined || this.savedCategories.length === 0) {
       for (let i = 0; i < 3; i++) {
         categories.push(this.getRandomCategoryName());
       }
+    } else {
+      categories = this.savedCategories;
     }
 
     let dataArray: number[] = []; //workaround to have a type definition within the object
@@ -89,7 +89,7 @@ export default defineComponent({
       this.$emit('diagram-categories-emitted', {categories: this.categories})
     },
     getRandomCategoryName(): string {
-      let sampleCategoryNames: string[] = ['sweet', 'salty', 'sour', 'smokey', 'flowery', 'bitter', 'funny', 'hot', 'spicy'];
+      let sampleCategoryNames: string[] = ['sweet', 'salty', 'sour', 'smoky', 'flowery', 'bitter', 'funny', 'hot', 'spicy'];
       return sampleCategoryNames[Math.floor(Math.random() * sampleCategoryNames.length)];
     }
   },

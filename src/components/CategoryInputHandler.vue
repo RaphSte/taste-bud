@@ -43,7 +43,7 @@ export default {
   },
   data() {
     return {
-      sampleCategoryNames: ['sweet', 'salty', 'sour', 'smokey', 'flowery', 'bitter', 'funny', 'hot', 'spicy', 'okay'],
+      sampleCategoryNames: ['sweet', 'salty', 'sour', 'smoky', 'flowery', 'bitter', 'funny', 'hot', 'spicy', 'okay'],
     }
   },
 }

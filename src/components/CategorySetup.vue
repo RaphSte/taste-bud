@@ -20,14 +20,12 @@
       />
     </div>
   </div>
-
 </template>
 
 <script lang="ts">
 import {defineComponent} from "vue";
 import SpiderDiagram from "@/components/SpiderDiagram.vue";
 import CategoryInputHandler from "@/components/CategoryInputHandler.vue";
-
 
 export default defineComponent({
   name: "CategorySetup",
@@ -38,7 +36,6 @@ export default defineComponent({
   data() {
 
     let categories: string[] = [];
-
 
     if (this.savedCategories == undefined || this.savedCategories.length === 0) {
       for (let i = 0; i < 3; i++) {

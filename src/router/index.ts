@@ -13,10 +13,15 @@ const routes: Array<RouteRecordRaw> = [
         path: '/config/',
         component: () => import('@/views/SessionConfig.vue'),
     },
+    // {
+    //     path: '/success/',
+    //     component: () => import('@/views/SubmitSuccess.vue'),
+    //     props: (route) => ({tastingSessionCode: route.query.tastingSessionCode}),
+    // },
     {
-        path: '/success/',
+        path: '/success/:tastingSessionCode',
         component: () => import('@/views/SubmitSuccess.vue'),
-        props: true,
+        props: true
     },
     {
         path: '/tabs/',

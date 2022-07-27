@@ -57,8 +57,5 @@ export default {
   margin-left: 10%;
 }
 
-.add-category-button {
-
-}
 
 </style>

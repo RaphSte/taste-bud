@@ -1,27 +1,27 @@
 <template>
   <ion-header>
-    <ion-toolbar >
+    <ion-toolbar>
       <div class="toolbar">
-      <ion-buttons class="back-button-wrapper" slot="start">
-        <ion-button @click="this.$emit('header-back-pressed')">
-          <ion-icon :icon="arrowBackOutline"/>
-          {{ previousStepName }}
-        </ion-button>
-      </ion-buttons>
-      <ion-title class="title">{{ currentStepName }}: step {{ currentStep }} / {{ targetStep }}</ion-title>
+        <ion-buttons class="back-button-wrapper" slot="start">
+          <ion-button @click="this.$emit('header-back-pressed')">
+            <ion-icon :icon="arrowBackOutline"/>
+            {{ previousStepName }}
+          </ion-button>
+        </ion-buttons>
+        <ion-title>{{ currentStepName }}: step {{ currentStep }} / {{ targetStep }}</ion-title>
       </div>
     </ion-toolbar>
   </ion-header>
 </template>
 
 <script lang="ts">
-import {IonButtons, IonHeader, IonButton, IonToolbar} from '@ionic/vue';
+import {IonButtons, IonHeader, IonButton, IonToolbar, IonTitle, IonIcon} from '@ionic/vue';
 import {arrowBackOutline} from 'ionicons/icons';
 import {defineComponent} from 'vue';
 
 export default defineComponent({
 
-  components: {IonButtons, IonHeader, IonButton, IonToolbar},
+  components: {IonButtons, IonHeader, IonButton, IonToolbar, IonTitle, IonIcon},
 
   name: "ConfigHeader",
   props: {
@@ -42,13 +42,9 @@ export default defineComponent({
 
 
 .toolbar {
-  display: flex;
-  justify-content: space-between;
-}
-
-.title{
-  /*TODO: i dont know how to center this one because css hates me */
-  text-align: center;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
 }
 
 </style>

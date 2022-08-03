@@ -6,33 +6,38 @@
         <p v-if="descriptionText">{{ descriptionText }}</p>
       </ion-text>
     </ion-item>
+
     <div class="input-wrapper">
       <ion-item>
         <ion-label position="stacked">{{ labelText }}</ion-label>
         <ion-input
-            :value="inputValue"
+            :value="sessionNameRef"
             :placeholder="inputValue !== ''  ? inputValue :placeHolder"
-            v-model="sessionName"
+            v-model="sessionNameRef"
             @input="handleInput"
+            clear-input
         ></ion-input>
-        <!--    TODO: set value of ion input to input value if exists. find out why this is not working -->
+        <ion-icon class="input-icon" v-if="icon && !sessionNameRef" :icon="icon" @click="setSessionNameFromClipboard"/>
       </ion-item>
     </div>
   </div>
+
 </template>
 
 <script lang="ts">
-import {defineComponent} from "vue";
-import {IonInput, IonItem, IonLabel, IonText} from "@ionic/vue";
+import {defineComponent, ref} from "vue";
+import {IonInput, IonItem, IonLabel, IonText, IonIcon,} from "@ionic/vue";
+import {Clipboard} from "@capacitor/clipboard";
 
 export default defineComponent({
-  name: "SetupInput",
-  components: {IonInput, IonItem, IonLabel, IonText}, //import component to have v-model work
+  name: "InputComponent",
+  components: {IonInput, IonItem, IonLabel, IonText, IonIcon,}, //import component to have v-model work
   props: {
     labelText: String,
     placeHolder: String,
     inputValue: String,
     descriptionText: String,
+    icon: String,
   },
   data() {
     return {
@@ -40,17 +45,29 @@ export default defineComponent({
     }
   },
   setup() {
+    const sessionNameRef = ref("");
+    const setSessionNameRef = (state: string) => sessionNameRef.value = state;
     return {
-      sessionName: ""
+      sessionNameRef,
+      setSessionNameRef
+    }
+  },
+  mounted() {
+    if (this.inputValue) {
+      this.setSessionNameRef(this.inputValue)
     }
   },
   methods: {
     handleInput() { //this is a workaround to deal with the performance issues of emitting events
       clearTimeout(this.rerenderTimer)
       this.rerenderTimer = setTimeout(() => {
-        this.$emit('setup-input-registered', {inputValue: this.sessionName})
+        this.$emit('setup-input-registered', {inputValue: this.sessionNameRef})
       }, 100);
-    }
+    },
+    async setSessionNameFromClipboard() {
+      let result = await Clipboard.read();
+      this.setSessionNameRef(result.value)
+    },
   }
 })
 </script>
@@ -61,4 +78,11 @@ export default defineComponent({
   margin-right: 10%;
   margin-left: 10%;
 }
+
+.input-icon {
+  position: absolute;
+  right: 4%;
+  top: 45%;
+}
+
 </style>

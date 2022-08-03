@@ -16,7 +16,7 @@
       <Transition :name="goingForward() ? 'slide-left': 'slide-right'">
 
 
-        <setup-input
+        <input-component
             v-if="stepCount === 1"
             label-text="Your Name"
             place-holder="Alice"
@@ -25,7 +25,7 @@
             @setup-input-registered="handleSetupInput"
         />
 
-        <setup-input
+        <input-component
             v-else-if="stepCount === 2"
             label-text="Name Your Event"
             place-holder="WhiskeyTasing 2022"
@@ -83,7 +83,7 @@
 
 <script lang="ts">
 import ConfigHeader from "@/components/ConfigHeader.vue";
-import SetupInput from "@/components/SetupInput.vue";
+import InputComponent from "@/components/InputComponent.vue";
 import {defineComponent, ref} from 'vue'
 import router from "@/router";
 import CategorySetup from "@/components/CategorySetup.vue";
@@ -97,7 +97,7 @@ export default defineComponent({
   components: {
     PreviewComponent,
     CategorySetup,
-    SetupInput,
+    InputComponent,
     ConfigHeader,
     IonLoading,
     IonPage,

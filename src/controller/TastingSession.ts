@@ -27,7 +27,7 @@ export async function createTastingSession(tastingSessionConfig: TastingSessionC
 }
 
 
-export async function getTastingSession(documentId: string): Promise<any> {
+export async function fetchTastingSession(documentId: string): Promise<any> {
     const tastingSessionRef = doc(db, ROOT_COLLECTION_NAME, documentId);
     const tastingSessionSnap = await getDoc(tastingSessionRef);
 

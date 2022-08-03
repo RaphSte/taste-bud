@@ -39,10 +39,11 @@
 import {defineComponent, ref} from "vue";
 import {createOutline} from 'ionicons/icons';
 import {Clipboard} from '@capacitor/clipboard';
-import {getTastingSession} from "@/controller/TastingSession";
+import {fetchTastingSession} from "@/controller/TastingSession";
 
 import {IonButton, IonItem, IonPage, IonText, IonInput, IonLabel, IonIcon, IonToast,} from "@ionic/vue";
 import HeaderComponent from "@/components/HeaderComponent.vue";
+import {getSessionKeyFromPreferences, setSessionKeyToPreferences} from "@/controller/LocalStorage";
 
 export default defineComponent({
   name: "JoinDialog",
@@ -61,18 +62,20 @@ export default defineComponent({
     }
   },
   methods: {
-    async readFromClipboard() {
+    async setSessionNameFromClipboard() {
       let result = await Clipboard.read();
       console.log(result.value)
       this.sessionCodeString = result.value;
     },
     processSessionCode(sessionCode: string) {
-      getTastingSession(sessionCode).then((sessionObject) => {
+      fetchTastingSession(sessionCode).then((sessionObject) => {
         this.displayToast();
+        console.log(sessionObject)
+        setSessionKeyToPreferences(sessionCode);
         //TODO redirect to session page
       }).catch((err) => {
         console.log("failed to load document: ", err)
-        this.displayToast(err);
+        this.displayToast("Failed to fetch session: " + err);
       })
     },
     displayToast(errorMessage?: string) {

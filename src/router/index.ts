@@ -13,11 +13,10 @@ const routes: Array<RouteRecordRaw> = [
         path: '/config/',
         component: () => import('@/views/SessionConfig.vue'),
     },
-    // {
-    //     path: '/success/',
-    //     component: () => import('@/views/SubmitSuccess.vue'),
-    //     props: (route) => ({tastingSessionCode: route.query.tastingSessionCode}),
-    // },
+    {
+        path: '/join/',
+        component: () => import('@/views/JoinDialog.vue'),
+    },
     {
         path: '/success/:tastingSessionCode',
         component: () => import('@/views/SubmitSuccess.vue'),

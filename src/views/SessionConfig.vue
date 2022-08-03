@@ -22,7 +22,7 @@
             place-holder="Alice"
             description-text="For all the participants to know that you are the one carrying out the event. This heps your participants to know they've gotten to the right event."
             :input-value="sessionKey"
-            @setup-input-registered="handleSetupInput"
+            @input-registered="handleSetupInput"
         />
 
         <input-component
@@ -31,7 +31,7 @@
             place-holder="WhiskeyTasing 2022"
             description-text="Every event needs a name. Give a name to your event, so that your participants know what sort of event they are dealing with!"
             :input-value="sessionKey"
-            @setup-input-registered="handleSetupInput"
+            @input-registered="handleSetupInput"
         />
 
         <category-setup
@@ -139,8 +139,8 @@ export default defineComponent({
         this.stepCount--;
       }
     },
-    handleSetupInput(event: any) {
-      this.sessionKey = event.inputValue;
+    handleSetupInput(inputValue: string) {
+      this.sessionKey = inputValue;
     },
     handleCategoriesEmitted(event: any) {
       this.categories = event.categories;

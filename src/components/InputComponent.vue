@@ -61,12 +61,13 @@ export default defineComponent({
     handleInput() { //this is a workaround to deal with the performance issues of emitting events
       clearTimeout(this.rerenderTimer)
       this.rerenderTimer = setTimeout(() => {
-        this.$emit('setup-input-registered', {inputValue: this.sessionNameRef})
+        this.$emit('input-registered', this.sessionNameRef)
       }, 100);
     },
     async setSessionNameFromClipboard() {
       let result = await Clipboard.read();
       this.setSessionNameRef(result.value)
+      this.handleInput();
     },
   }
 })

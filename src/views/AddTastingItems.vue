@@ -3,37 +3,38 @@
     <header-component
         title="Add Tasting Items"
     />
+    <ion-content>
+      <div class="input-component-wrapper">
+        <input-component
+            label-text="Enter Your Code Here"
+            place-holder="or press the button to copy it "
+            description-text="You need to join a session to be able to add items to it. You can do it by entering your session code into the field below"
+            :input-value="sessionKey"
+            :icon="createOutline"
+            @input-registered="handleSessionCodeInput"
+        />
+      </div>
 
-    <div class="input-component-wrapper">
-      <input-component
-          label-text="Enter Your Code Here"
-          place-holder="or press the button to copy it "
-          description-text="You need to join a session to be able to add items to it. You can do it by entering your session code into the field below"
-          :input-value="sessionKey"
-          :icon="createOutline"
-          @setup-input-registered="handleSetupInput"
-      />
-    </div>
-    <ion-item>
-      <ion-text>
-        <p>blah blah this is an explanation. paste your code to join the session...</p>
-      </ion-text>
-    </ion-item>
-    <ion-button
-        expand="block"
-        @click="processSessionCode(sessionCodeString)"
-        class="join-button"
+      <ion-toast
+          :is-open="toastIsOpenRef"
+          :message="toastMessage"
+          :duration="2500"
+          @didDismiss="toastSetOpen(false)"
+          :color="toastColor"
+      >
+      </ion-toast>
+    </ion-content>
+    <ion-footer
+        collapse="fade"
     >
-      Join
-    </ion-button>
-    <ion-toast
-        :is-open="toastIsOpenRef"
-        :message="toastMessage"
-        :duration="2500"
-        @didDismiss="toastSetOpen(false)"
-        :color="toastColor"
-    >
-    </ion-toast>
+      <ion-button
+          expand="block"
+          @click="processSessionCode(sessionCodeString)"
+          class="button-primary"
+      >
+        Join
+      </ion-button>
+    </ion-footer>
   </ion-page>
 </template>
 
@@ -43,13 +44,13 @@ import {createOutline} from 'ionicons/icons';
 import {Clipboard} from '@capacitor/clipboard';
 import {fetchTastingSession} from "@/controller/TastingSession";
 
-import {IonButton, IonItem, IonPage, IonText, IonInput, IonLabel, IonIcon, IonToast,} from "@ionic/vue";
+import {IonButton, IonPage, IonToast, IonContent, IonFooter} from "@ionic/vue";
 import HeaderComponent from "@/components/HeaderComponent.vue";
 import InputComponent from "@/components/InputComponent.vue";
 
 export default defineComponent({
   name: "AddTastingItems",
-  components: {HeaderComponent, IonText, IonPage, IonButton, IonItem,  IonToast, InputComponent},
+  components: {HeaderComponent, IonPage, IonButton, IonToast, InputComponent, IonContent, IonFooter},
   setup() {
     const toastIsOpenRef = ref(false);
     const toastSetOpen = (state: boolean) => toastIsOpenRef.value = state;
@@ -85,6 +86,10 @@ export default defineComponent({
       }
       this.toastSetOpen(true)
     },
+    handleSessionCodeInput(inputValue: string){
+      this.sessionKey = inputValue;
+      console.log(this.sessionKey)
+    }
   },
 });
 </script>

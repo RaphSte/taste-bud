@@ -15,7 +15,7 @@
     <ion-item text-center>
       <ion-text class="ion-text-center">
         <h1>Add Items to be Tasted</h1>
-        <ion-button color="tertiary" expand="block" router-link="/config/add/items">Prepare Tasting Session</ion-button>
+        <ion-button color="tertiary" expand="block" router-link="/config/tasting-items">Prepare Tasting Session</ion-button>
       </ion-text>
     </ion-item>
 

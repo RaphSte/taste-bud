@@ -14,6 +14,10 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/SessionConfig.vue'),
     },
     {
+        path: '/config/tasting-items/',
+        component: () => import('@/views/AddTastingItems.vue'),
+    },
+    {
         path: '/join/',
         component: () => import('@/views/JoinDialog.vue'),
     },

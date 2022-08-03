@@ -1,7 +1,7 @@
 <template>
   <ion-header>
     <ion-toolbar>
-      <div class="toolbar">
+      <div class="toolbar-content-center">
         <ion-buttons class="back-button-wrapper" slot="start">
           <ion-button @click="this.$emit('header-back-pressed')">
             <ion-icon :icon="arrowBackOutline"/>
@@ -39,12 +39,5 @@ export default defineComponent({
 </script>
 
 <style scoped>
-
-
-.toolbar {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-}
 
 </style>

@@ -1,15 +1,8 @@
 <template>
   <ion-page>
-    <ion-header>
-      <ion-toolbar>
-        <div class="toolbar-content-center">
-          <ion-buttons class="back-button-wrapper" slot="start">
-            <ion-back-button default-href="/"></ion-back-button>
-          </ion-buttons>
-          <ion-title>Join A Tasting Session</ion-title>
-        </div>
-      </ion-toolbar>
-    </ion-header>
+    <header-component
+        title="Join A Tasting Session"
+    />
 
     <ion-item>
       <ion-label position="floating">press here to paste your code</ion-label>
@@ -48,39 +41,12 @@ import {createOutline} from 'ionicons/icons';
 import {Clipboard} from '@capacitor/clipboard';
 import {getTastingSession} from "@/controller/TastingSession";
 
-import {
-  IonButton,
-  IonItem,
-  IonPage,
-  IonText,
-  IonButtons,
-  IonHeader,
-  IonToolbar,
-  IonBackButton,
-  IonTitle,
-  IonInput,
-  IonLabel,
-  IonIcon,
-  IonToast,
-} from "@ionic/vue";
+import {IonButton, IonItem, IonPage, IonText, IonInput, IonLabel, IonIcon, IonToast,} from "@ionic/vue";
+import HeaderComponent from "@/components/HeaderComponent.vue";
 
 export default defineComponent({
   name: "JoinDialog",
-  components: {
-    IonText,
-    IonPage,
-    IonButton,
-    IonHeader,
-    IonToolbar,
-    IonButtons,
-    IonBackButton,
-    IonTitle,
-    IonItem,
-    IonInput,
-    IonLabel,
-    IonIcon,
-    IonToast,
-  },
+  components: {HeaderComponent, IonText, IonPage, IonButton, IonItem, IonInput, IonLabel, IonIcon, IonToast},
   setup() {
     const toastIsOpenRef = ref(false);
     const toastSetOpen = (state: boolean) => toastIsOpenRef.value = state;

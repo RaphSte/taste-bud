@@ -56,7 +56,7 @@
           v-if="stepCount < 4"
           expand="block"
           @click="() => {this.previousStepCount = stepCount; stepCount++}"
-          class="next-button"
+          class="button-primary"
       >
         Next
       </ion-button>
@@ -64,7 +64,7 @@
           expand="block"
           v-if="stepCount === 4"
           @click="submitSessionConfig"
-          class="next-button"
+          class="button-primary"
       >
         Submit
       </ion-button>
@@ -186,38 +186,6 @@ export default defineComponent({
 </script>
 
 <style scoped>
-
-.next-button {
-  margin-bottom: 20px;
-  margin-right: 7%;
-  margin-left: 7%;
-}
-
-
-.slide-left-enter-active,
-.slide-right-enter-active {
-  transition: all 0.25s ease-out;
-  transition-delay: 0.25s;
-
-}
-
-.slide-right-leave-active,
-.slide-left-leave-active {
-  transition: all 0.25s ease-out;
-
-}
-
-.slide-right-leave-to,
-.slide-left-enter-from {
-  opacity: 0;
-  transform: translateX(100%);
-}
-
-.slide-right-enter-from,
-.slide-left-leave-to {
-  opacity: 0;
-  transform: translateX(-100%);
-}
 
 
 </style>

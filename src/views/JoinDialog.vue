@@ -20,7 +20,7 @@
     <ion-button
         expand="block"
         @click="processSessionCode(sessionCodeString)"
-        class="join-button"
+        class="button-primary"
     >
       Join
     </ion-button>
@@ -92,9 +92,4 @@ export default defineComponent({
 
 <style scoped>
 
-.join-button {
-  margin-bottom: 20px;
-  margin-right: 7%;
-  margin-left: 7%;
-}
 </style>

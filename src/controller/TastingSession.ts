@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import {initializeApp} from "firebase/app";
-import {getFirestore, collection, doc, getDocs, addDoc, deleteDoc, setDoc} from 'firebase/firestore/lite';
+import {getFirestore, collection, doc, getDoc, addDoc, deleteDoc, setDoc} from 'firebase/firestore/lite';
 import {TastingSessionConfigurationModel} from "@/types/TastingSessionConfiguration";
 
 const ROOT_COLLECTION_NAME = 'tasting-sessions';
@@ -24,4 +24,23 @@ export async function createTastingSession(tastingSessionConfig: TastingSessionC
     const sessionDocRef = await addDoc(tastingSessionsCollection, tastingSessionConfig)
     console.log("document added with id: " + sessionDocRef.id);
     return sessionDocRef.id;
+}
+
+
+export async function getTastingSession(documentId: string): Promise<any> {
+    const tastingSessionRef = doc(db, ROOT_COLLECTION_NAME, documentId);
+    const tastingSessionSnap = await getDoc(tastingSessionRef);
+
+
+    return new Promise<any>((resolve, reject) => {
+
+        if (tastingSessionSnap.exists()) {
+            resolve(tastingSessionSnap.data());
+        } else {
+            reject("No such document!");
+        }
+
+    })
+
+
 }

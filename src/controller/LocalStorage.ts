@@ -13,7 +13,6 @@ export async function setSessionKeyToPreferences(tastingSessionKey: string) {
     });
 }
 
-// JSON "get" example
 export async function getSessionKeyFromPreferences(): Promise<string> {
     const ret = await Preferences.get({key: TASTING_SESSION_KEY});
     console.log(ret.value)

@@ -79,7 +79,6 @@ export default defineComponent({
       })
     },
     displayToast(errorMessage?: string) {
-      console.log("asdasd", errorMessage)
       if (!errorMessage) {
         this.toastColor = "success"
         this.toastMessage = "joined successful"

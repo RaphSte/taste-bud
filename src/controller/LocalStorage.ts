@@ -26,9 +26,3 @@ export async function getSessionKeyFromPreferences(): Promise<string> {
 }
 
 
-
-getSessionKeyFromPreferences().then((key) => {
-    console.log("session key is: ", key)
-}).catch((err) => {
-    console.log(err)
-})

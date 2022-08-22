@@ -7,30 +7,39 @@
 
 
       <Transition :name="!needsActiveSessionRef ? 'slide-left': 'slide-right'">
-        <div
+        <input-component
             v-if="needsActiveSessionRef"
-            class="input-component-wrapper">
-          <input-component
-              label-text="Enter Your Code Here"
-              place-holder="or press the button to copy it "
-              description-text="You need to join a session to be able to add items to it. You can do it by entering your session code into the field below"
-              :input-value="sessionKey"
-              :icon="createOutline"
-              @input-registered="handleSessionCodeInput"
-          />
-        </div>
-      </Transition>
+            label-text="Enter Your Code Here"
+            place-holder="or press the button to copy it "
+            description-text="You need to join a session to be able to add items to it. You can do it by entering your session code into the field below"
+            :input-value="sessionKey"
+            :icon="createOutline"
+            @input-registered="handleSessionCodeInput"
+        />
+        <div v-else-if="!needsActiveSessionRef">
+          <div class="ion-text-center">
+            <ion-label>Not the correct session? Switch to another</ion-label>
+            <ion-button
+                expand="block"
+                @click="setNeedsActiveSession(true)"
+                class="button-secondary ion-color-secondary"
+                color="secondary"
+            >
+              Change Session
+            </ion-button>
+            <ion-text>
+              <p>Use the input below to add things to the tasting session</p>
+            </ion-text>
+          </div>
+          <input-item-list-handler
+              label-text="Add things to be tasted "
+              :sample-list-items="sampleTastingItems"
+              :list-items="tastingItems"
+              @list-item-added="handleTastingItemAdded"
+              @list-item-rename="handleTastingItemRename"
+              @list-item-removed="handleTastingItemRemoved"
 
-      <Transition :name="!needsActiveSessionRef ? 'slide-left': 'slide-right'">
-        <div v-if="!needsActiveSessionRef">
-          <ion-label class="ion-text-center">Not the correct session? Switch to another</ion-label>
-          <ion-button
-              expand="block"
-              @click="setNeedsActiveSession(true)"
-              class="button-primary"
-          >
-            Change Session
-          </ion-button>
+          />
         </div>
       </Transition>
 
@@ -66,15 +75,19 @@ import {Clipboard} from '@capacitor/clipboard';
 import {fetchTastingSession} from "@/controller/TastingSession";
 import {getSessionKeyFromPreferences} from "@/controller/LocalStorage";
 
-import {IonButton, IonPage, IonToast, IonContent, IonFooter, IonLabel, IonItem} from "@ionic/vue";
+import {IonButton, IonPage, IonToast, IonContent, IonFooter, IonLabel, IonText} from "@ionic/vue";
 import HeaderComponent from "@/components/HeaderComponent.vue";
 
 import InputComponent from "@/components/InputComponent.vue";
+import InputItemListHandler from "@/components/InputItemListHandler.vue";
 
 
 export default defineComponent({
   name: "AddTastingItems",
-  components: {HeaderComponent, IonPage, IonButton, IonToast, InputComponent, IonContent, IonFooter, IonLabel},
+  components: {
+    InputItemListHandler,
+    HeaderComponent, IonPage, IonButton, IonToast, InputComponent, IonContent, IonFooter, IonLabel, IonText
+  },
   setup() {
     const toastIsOpenRef = ref(false);
     const toastSetOpen = (state: boolean) => toastIsOpenRef.value = state;
@@ -88,8 +101,7 @@ export default defineComponent({
       sessionKey = preferenceSessionKey;
       setNeedsActiveSession(false);
       console.log("preferenceSessionKey: ", preferenceSessionKey)
-    })
-
+    });
 
     return {
       createOutline,
@@ -103,8 +115,15 @@ export default defineComponent({
       needsActiveSessionRef,
     }
   },
-  methods: {
+  data() {
+    let tastingItems: string[] = []
 
+    return {
+      sampleTastingItems: ['my favourite whiskey', 'my favourite beer'],
+      tastingItems,
+    };
+  },
+  methods: {
     processSessionCode(sessionCode: string) {
       fetchTastingSession(sessionCode).then((sessionObject) => {
         console.log(JSON.stringify(sessionObject));
@@ -127,17 +146,22 @@ export default defineComponent({
     },
     handleSessionCodeInput(inputValue: string) {
       this.sessionKey = inputValue;
+    },
+    handleTastingItemAdded(item: string) {
+      this.tastingItems.push(item)
+    },
+    handleTastingItemRename(item: string, index: number) {
+      this.tastingItems[index] = item
+    },
+    handleTastingItemRemoved(index: number) {
+      this.tastingItems.splice(index, 1);
     }
+
   },
 });
 </script>
 
 <style scoped>
 
-.input-component-wrapper {
-  display: grid;
-  grid-template-columns: auto auto;
-  align-items: center;
-}
 
 </style>

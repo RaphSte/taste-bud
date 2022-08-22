@@ -29,7 +29,7 @@
     >
       <ion-button
           expand="block"
-          @click="processSessionCode(sessionCodeString)"
+          @click="processSessionCode(sessionKey)"
           class="button-primary"
       >
         Join
@@ -57,7 +57,6 @@ export default defineComponent({
     return {
       createOutline,
       Clipboard,
-      sessionCodeString: "",
       toastIsOpenRef,
       toastSetOpen,
       toastColor: "warning",

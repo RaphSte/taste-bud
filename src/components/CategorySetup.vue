@@ -71,6 +71,7 @@ export default defineComponent({
     handleCategoryAdded(categoryName: string) {
       this.categories.push(categoryName);
       this.series[0].data.push(Math.floor(Math.random() * 11)) //random number between 0 and 10 for each new category
+      this.emitDiagramData();
     },
     handleCategoryRename(event: any) {
       this.categories[event.index] = event.name;

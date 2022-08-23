@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import {initializeApp} from "firebase/app";
 import {getFirestore, collection, doc, getDoc, addDoc, deleteDoc, setDoc} from 'firebase/firestore/lite';
-import {TastingSessionConfigurationModel} from "@/types/TastingSessionConfiguration";
+import {TastingSessionConfiguration} from "@/types/TastingSessionConfiguration";
 
 const ROOT_COLLECTION_NAME = 'tasting-sessions';
 // Your web app's Firebase configuration
@@ -19,7 +19,7 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 
-export async function createTastingSession(tastingSessionConfig: TastingSessionConfigurationModel) {
+export async function createTastingSession(tastingSessionConfig: TastingSessionConfiguration) {
     const tastingSessionsCollection = collection(db, ROOT_COLLECTION_NAME);
     const sessionDocRef = await addDoc(tastingSessionsCollection, tastingSessionConfig)
     console.log("document added with id: " + sessionDocRef.id);

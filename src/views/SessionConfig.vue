@@ -88,7 +88,7 @@ import {defineComponent, ref} from 'vue'
 import router from "@/router";
 import CategorySetup from "@/components/CategorySetup.vue";
 import PreviewComponent from "@/components/ConfigOverview.vue";
-import {TastingSessionConfigurationModel} from "@/types/TastingSessionConfiguration";
+import {TastingSessionConfiguration} from "@/types/TastingSessionConfiguration";
 import {createTastingSession} from "@/controller/TastingSession";
 import {IonLoading, IonPage, IonContent, IonButton, IonFooter} from "@ionic/vue";
 
@@ -163,10 +163,11 @@ export default defineComponent({
     },
     submitSessionConfig() {
       this.setOpen(true)
-      let sessionConfig: TastingSessionConfigurationModel = {
+      let sessionConfig: TastingSessionConfiguration = {
         sessionKey: this.sessionKey,
         creatorId: "asd",
-        categories: this.categories
+        creatorName: "asd",
+        categories: this.categories,
       }
 
       createTastingSession(sessionConfig).then((sessionKey) => {

@@ -120,10 +120,9 @@ export default defineComponent({
         setTastingSessionRef(sessionObject);
         let tastingItems = sessionObject.tastingItems.map((e: TastingItem) => {return e.tastingItemName});
         setTastingItemNamesRef(tastingItems);
-        console.log(JSON.stringify(tastingItemNames.value));
-
       }).catch((err) => {
         console.log("failed to load document in setup!: ", err, sessionKey)
+        //TODO error handling
       })
     }
 
@@ -132,7 +131,6 @@ export default defineComponent({
       setSessionKeyRef(preferenceSessionKey)
       processSessionCode(sessionKey.value);
       setNeedsActiveSession(false);
-      console.log("preferenceSessionKey: ", preferenceSessionKey)
     });
 
     return {
@@ -159,10 +157,11 @@ export default defineComponent({
   methods: {
     processSessionCode(sessionCode: string) {
       fetchTastingSession(sessionCode).then((sessionObject) => {
-        console.log(JSON.stringify(sessionObject));
         this.displayToast();
         this.setNeedsActiveSession(false);
         setSessionKeyToPreferences(sessionCode)
+        //TODO refactor?
+        this.setTastingItemNamesRef(sessionObject.tastingItems.map((e: TastingItem) => {return e.tastingItemName}));
       }).catch((err) => {
         console.log("failed to load document: ", err)
         this.displayToast(err);

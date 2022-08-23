@@ -1,20 +1,30 @@
 <template>
 
   <div class="category-input-handler-wrapper">
-    <ion-item>
-      <ion-label class="ion-padding-start" position="stacked">{{ labelText }}</ion-label>
+    <ion-item :class="{'shake': shakeInputActive}">
+
+      <ion-label class="ion-padding-start" position="stacked">
+        {{ labelText }}
+      </ion-label>
       <div class="input-wrapper ion-padding-start ion-margin-end ion-padding-end">
         <ion-input
+            v-if="!shakeInputActive"
             inputmode="text"
-            :placeholder="'such as ' + sampleListItems[listItems.length % sampleListItems.length]"
             v-model="listItemName"
+            :placeholder="'such as ' + sampleListItems[listItems.length % sampleListItems.length]"
             :clear-input="true"
             @keyup.enter="addListItem(listItemName)"
         >
         </ion-input>
+        <ion-text color="danger">
+          <p v-if="shakeInputActive">Input cannot be empty!</p>
+        </ion-text>
       </div>
-      <ion-icon class="input-icon ion-no-margin" slot="end" color="secondary" :icon="addOutline"
-                @click="addListItem(listItemName)"/>
+
+      <ion-icon class="input-icon ion-no-margin ion-color ion-color-secondary" slot="end" :icon="addOutline"
+                @click="addListItem(listItemName)"
+                :class="{'rotate-90-degrees': rotateAddIcon}"
+      />
     </ion-item>
 
 
@@ -44,13 +54,15 @@ import {
   IonLabel,
   IonReorder,
   IonReorderGroup,
+  IonText,
 } from "@ionic/vue";
 import {trash, addOutline, reorderThree} from 'ionicons/icons';
 import {defineComponent, ref} from "vue";
+import {BoolRefSetter} from "@/types/FunctionTypes";
 
 export default defineComponent({
   name: "InputItemListHandler",
-  components: {IonInput, IonItem, IonIcon, IonLabel, IonReorder, IonReorderGroup},
+  components: {IonInput, IonItem, IonIcon, IonLabel, IonReorder, IonReorderGroup, IonText},
   emits: ["list-item-added", "list-item-removed", "list-item-rename", "list-reorder"],
 
   props: {
@@ -66,18 +78,45 @@ export default defineComponent({
     }
   },
   data() {
+    const rotateAddIcon = ref(false)
+    const setRotateAddIcon: BoolRefSetter = (state: boolean) => {
+      rotateAddIcon.value = state
+    }
+
+    const shakeInputActive = ref(false)
+    const setShakeInput: BoolRefSetter = (state: boolean) => {
+      shakeInputActive.value = state
+    }
+
+
     return {
-      listItemName: ""
+      listItemName: "",
+      rotateAddIcon,
+      setRotateAddIcon,
+      shakeInputActive,
+      setShakeInput,
     }
   },
   methods: {
     addListItem(itemName: string) {
+      if (itemName == '') {
+        this.performAnimation(this.setShakeInput, 820);
+        return
+      }
+
       this.$emit('list-item-added', itemName != undefined ? itemName : "")
       this.listItemName = ""
+      this.performAnimation(this.setRotateAddIcon, 250)
     },
     doReorder(event: CustomEvent) {
       event.detail.complete();
       this.$emit('list-reorder', event.detail.from, event.detail.to)
+    },
+    performAnimation(refSetter: BoolRefSetter, animationTime = 250) {
+      refSetter(true);
+      setTimeout(() => {
+        refSetter(false)
+      }, animationTime);
     },
   }
 })

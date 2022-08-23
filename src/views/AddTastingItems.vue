@@ -32,13 +32,14 @@
             </ion-text>
           </div>
           <input-item-list-handler
+              :key="inputItemListHandlerUpdate"
               label-text="Add things to be tasted "
               :sample-list-items="sampleTastingItems"
               :list-items="tastingItems"
               @list-item-added="handleTastingItemAdded"
               @list-item-rename="handleTastingItemRename"
               @list-item-removed="handleTastingItemRemoved"
-
+              @list-reorder="handleTastingItemReorder"
           />
         </div>
       </Transition>
@@ -75,7 +76,7 @@ import {Clipboard} from '@capacitor/clipboard';
 import {fetchTastingSession} from "@/controller/TastingSession";
 import {getSessionKeyFromPreferences} from "@/controller/LocalStorage";
 
-import {IonButton, IonPage, IonToast, IonContent, IonFooter, IonLabel, IonText} from "@ionic/vue";
+import {IonButton, IonContent, IonFooter, IonLabel, IonPage, IonText, IonToast} from "@ionic/vue";
 import HeaderComponent from "@/components/HeaderComponent.vue";
 
 import InputComponent from "@/components/InputComponent.vue";
@@ -121,6 +122,7 @@ export default defineComponent({
     return {
       sampleTastingItems: ['my favourite whiskey', 'my favourite beer'],
       tastingItems,
+      inputItemListHandlerUpdate: 0,
     };
   },
   methods: {
@@ -155,7 +157,15 @@ export default defineComponent({
     },
     handleTastingItemRemoved(index: number) {
       this.tastingItems.splice(index, 1);
-    }
+    },
+    handleTastingItemReorder(indexFrom: number, indexTo: number) {
+      let movedElement = this.tastingItems[indexFrom];
+      this.tastingItems.splice(indexFrom, 1);
+      this.tastingItems.splice(indexTo, 0, movedElement);
+
+        console.log({b: this.tastingItems.toString()})
+      this.inputItemListHandlerUpdate++;
+    },
 
   },
 });

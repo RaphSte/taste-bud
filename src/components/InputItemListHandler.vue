@@ -18,34 +18,40 @@
     </ion-item>
 
 
-    <div v-for="(item, index) in listItems" :key="index">
-      <ion-item-divider class="ion-padding-left item-divider">
-        <ion-item class="category-input-wrapper">
-          <ion-label position="fixed">{{ index + 1 }}.</ion-label>
-          <ion-input
-              :value="item"
-              @input="e => this.$emit('list-item-rename', e.target.value, index)"
-              :placeholder="sampleListItems[index % sampleListItems.length]"
-          ></ion-input>
-          <ion-label color="primary"/>
-          <ion-icon color="danger" :icon="trash" @click="this.$emit('list-item-removed', index)"/>
-        </ion-item>
+    <ion-reorder-group @ionItemReorder="doReorder($event)" :disabled="false">
+      <ion-item v-for="(item, index) in listItems" :key="index" class="category-input-wrapper">
+        <ion-reorder class="ion-padding-end" slot="start">{{ index + 1 }}.
+          <ion-icon class="reorder-icon" color="medium" :icon="reorderThree"/>
+        </ion-reorder>
+        <ion-input
+            :value="item"
+            @input="e => this.$emit('list-item-rename', e.target.value, index)"
+            :placeholder="sampleListItems[index % sampleListItems.length]"
+        ></ion-input>
 
-      </ion-item-divider>
-    </div>
+        <ion-icon color="danger" :icon="trash" @click="this.$emit('list-item-removed', index)"/>
+      </ion-item>
+    </ion-reorder-group>
 
   </div>
 </template>
 
 <script lang="ts">
-import {IonInput, IonItem, IonIcon, IonLabel, IonItemDivider} from "@ionic/vue";
-import {trash, addOutline} from 'ionicons/icons';
-import {defineComponent} from "vue";
+import {
+  IonInput,
+  IonItem,
+  IonIcon,
+  IonLabel,
+  IonReorder,
+  IonReorderGroup,
+} from "@ionic/vue";
+import {trash, addOutline, reorderThree} from 'ionicons/icons';
+import {defineComponent, ref} from "vue";
 
 export default defineComponent({
   name: "InputItemListHandler",
-  components: {IonInput, IonItem, IonIcon, IonLabel, IonItemDivider},
-  emits: ["list-item-added", "list-item-removed", "list-item-rename"],
+  components: {IonInput, IonItem, IonIcon, IonLabel, IonReorder, IonReorderGroup},
+  emits: ["list-item-added", "list-item-removed", "list-item-rename", "list-reorder"],
 
   props: {
     labelText: String,
@@ -56,6 +62,7 @@ export default defineComponent({
     return {
       addOutline,
       trash,
+      reorderThree,
     }
   },
   data() {
@@ -67,6 +74,10 @@ export default defineComponent({
     addListItem(itemName: string) {
       this.$emit('list-item-added', itemName != undefined ? itemName : "")
       this.listItemName = ""
+    },
+    doReorder(event: CustomEvent) {
+      event.detail.complete();
+      this.$emit('list-reorder', event.detail.from, event.detail.to)
     },
   }
 })
@@ -92,8 +103,10 @@ export default defineComponent({
   font-size: xx-large;
 }
 
-.item-divider {
-  padding-right: 16px;
-  background: transparent;
+.reorder-icon {
+  position: absolute;
+  top: 25%;
+  font-size: x-large;
+  padding-left: 8px
 }
 </style>

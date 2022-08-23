@@ -23,6 +23,7 @@
     "apexcharts": "^3.35.3",
     "core-js": "^3.6.5",
     "firebase": "^9.9.1",
+    "uuid": "^8.3.2",
     "vue": "^3.2.21",
     "vue-apexcharts": "^1.6.2",
     "vue-router": "^4.0.12",
@@ -31,6 +32,7 @@
   "devDependencies": {
     "@capacitor/cli": "^4.0.0",
     "@types/jest": "^27.0.2",
+    "@types/uuid": "^8.3.4",
     "@typescript-eslint/eslint-plugin": "^5.6.0",
     "@typescript-eslint/parser": "^5.6.0",
     "@vue/cli-plugin-babel": "~5.0.0-rc.1",

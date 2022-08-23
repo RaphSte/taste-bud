@@ -4,9 +4,9 @@ export type TastingSession = {
 }
 
 export type TastingSessionConfiguration = {
-    sessionKey: string;
     creatorId: string;
-    creatorName: string
+    creatorName: string;
+    sessionName: string;
     categories: string[];
 }
 

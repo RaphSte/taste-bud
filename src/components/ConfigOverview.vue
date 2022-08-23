@@ -31,7 +31,7 @@ export default defineComponent({
   name: "PreviewComponent",
   components: {IonItem, IonText, IonList, IonLabel},
   props: {
-    listItems: [],
+    categories: {type: Array<string>},
     sessionName: String,
   },
 });

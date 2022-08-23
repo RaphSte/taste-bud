@@ -19,7 +19,7 @@ export default {
   props: {
     title: String,
     height: Number,
-    listItems: [],
+    categories: [],
     seriesData: [],
   },
   el: '#app',
@@ -54,7 +54,7 @@ export default {
           size: 0
         },
         xaxis: {
-          listItems: this.listItems
+          categories: this.categories
         }
       },
     }

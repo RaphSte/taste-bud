@@ -12,7 +12,6 @@
 
     <ion-content>
 
-
       <Transition :name="goingForward() ? 'slide-left': 'slide-right'">
 
 
@@ -21,8 +20,8 @@
             label-text="Your Name"
             place-holder="Alice"
             description-text="For all the participants to know that you are the one carrying out the event. This heps your participants to know they've gotten to the right event."
-            :input-value="sessionKey"
-            @input-registered="handleSetupInput"
+            :input-value="creatorName"
+            @input-registered="handleCreatorNameInput"
         />
 
         <input-component
@@ -30,8 +29,8 @@
             label-text="Name Your Event"
             place-holder="WhiskeyTasing 2022"
             description-text="Every event needs a name. Give a name to your event, so that your participants know what sort of event they are dealing with!"
-            :input-value="sessionKey"
-            @input-registered="handleSetupInput"
+            :input-value="sessionName"
+            @input-registered="handleSessionNameInput"
         />
 
         <category-setup
@@ -41,7 +40,7 @@
         />
         <preview-component
             v-else-if="stepCount === 4"
-            :sessionName="sessionKey"
+            :sessionName="sessionName"
             :categories="categories"
         />
       </Transition>
@@ -91,6 +90,7 @@ import PreviewComponent from "@/components/ConfigOverview.vue";
 import {TastingSessionConfiguration} from "@/types/TastingSessionConfiguration";
 import {createTastingSession} from "@/controller/TastingSession";
 import {IonLoading, IonPage, IonContent, IonButton, IonFooter} from "@ionic/vue";
+import {createUserIdAndSaveToLocalStorage} from "@/util/IDUtil";
 
 export default defineComponent({
   name: "SessionConfig",
@@ -106,13 +106,16 @@ export default defineComponent({
     IonFooter,
   },
   data() {
-    let categories: string[] = [];
+    let catArray: string[] = [];
+    const categories = ref(catArray) //no direct assignment to introduce type
+    const setCategoriesRef = (state: string[]) => {categories.value = state}
     let goingForward = (): boolean => {
       return this.previousStepCount <= this.stepCount;
     }
     return {
+      creatorName: "",
       stepCount: 1, //starting at 1 for better readability
-      sessionKey: "",
+      sessionName: "",
       step0Name: "Home",
       step1Name: "Naming",
       step3Name: "Diagram",
@@ -120,6 +123,7 @@ export default defineComponent({
       previousStepCount: 1,
       previousStepName: "Home",
       categories,
+      setCategoriesRef,
       timeout: 0, //run forever
       goingForward,
     }
@@ -139,11 +143,15 @@ export default defineComponent({
         this.stepCount--;
       }
     },
-    handleSetupInput(inputValue: string) {
-      this.sessionKey = inputValue;
+    handleCreatorNameInput(creatorName: string) {
+      this.creatorName = creatorName;
+    },
+    handleSessionNameInput(sessionName: string) {
+      this.sessionName = sessionName;
     },
     handleCategoriesEmitted(event: any) {
-      this.categories = event.categories;
+      //this.categories = event.categories;
+      this.setCategoriesRef(event.categories)
     },
     getStepNameByCount(stepCount: number): string {
       switch (stepCount) {
@@ -161,12 +169,13 @@ export default defineComponent({
           return "defaultStep"
       }
     },
-    submitSessionConfig() {
+    async submitSessionConfig() {
       this.setOpen(true)
+      const creatorId = await createUserIdAndSaveToLocalStorage();
       let sessionConfig: TastingSessionConfiguration = {
-        sessionKey: this.sessionKey,
-        creatorId: "asd",
-        creatorName: "asd",
+        creatorId: creatorId,
+        creatorName: this.creatorName,
+        sessionName: this.sessionName,
         categories: this.categories,
       }
 

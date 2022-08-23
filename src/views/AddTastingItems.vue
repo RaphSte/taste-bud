@@ -4,8 +4,6 @@
         title="Add Tasting Items"
     />
     <ion-content>
-
-
       <Transition :name="!needsActiveSessionRef ? 'slide-left': 'slide-right'">
         <input-component
             v-if="needsActiveSessionRef"
@@ -35,7 +33,7 @@
               :key="inputItemListHandlerUpdate"
               label-text="Add things to be tasted "
               :sample-list-items="sampleTastingItems"
-              :list-items="tastingItems"
+              :list-items="tastingItemNames"
               @list-item-added="handleTastingItemAdded"
               @list-item-rename="handleTastingItemRename"
               @list-item-removed="handleTastingItemRemoved"
@@ -64,6 +62,13 @@
       >
         Join
       </ion-button>
+      <ion-button
+          expand="block"
+          @click="submitTastingItems"
+          class="button-primary"
+      >
+        submitTastingItems
+      </ion-button>
     </ion-footer>
   </ion-page>
 </template>
@@ -73,14 +78,15 @@ import {defineComponent, ref} from "vue";
 import {createOutline} from 'ionicons/icons';
 import {Clipboard} from '@capacitor/clipboard';
 
-import {fetchTastingSession} from "@/controller/TastingSession";
-import {getSessionKeyFromPreferences} from "@/controller/LocalStorage";
+import {addTastingItems, fetchTastingSession} from "@/controller/TastingSession";
+import {getSessionKeyFromPreferences, setSessionKeyToPreferences} from "@/controller/LocalStorage";
 
 import {IonButton, IonContent, IonFooter, IonLabel, IonPage, IonText, IonToast} from "@ionic/vue";
 import HeaderComponent from "@/components/HeaderComponent.vue";
 
 import InputComponent from "@/components/InputComponent.vue";
 import InputItemListHandler from "@/components/InputItemListHandler.vue";
+import {TastingItem, TastingSession} from "@/types/TastingSessionConfiguration";
 
 
 export default defineComponent({
@@ -93,13 +99,38 @@ export default defineComponent({
     const toastIsOpenRef = ref(false);
     const toastSetOpen = (state: boolean) => toastIsOpenRef.value = state;
 
-    let needsActiveSessionRef = ref(true);
+    const needsActiveSessionRef = ref(true);
     const setNeedsActiveSession = (state: boolean) => needsActiveSessionRef.value = state;
 
-    let sessionKey = "";
+
+    const tastingSessionRef = ref();
+    const setTastingSessionRef = (state: any) => tastingSessionRef.value = state;
+
+    let sessionKey = ref("");
+    const setSessionKeyRef = (state: string) => sessionKey.value = state;
+
+
+    let tastingItems: string[] = []
+    const tastingItemNames = ref(tastingItems);
+    const setTastingItemNamesRef = (state: string[]) => tastingItemNames.value = state;
+
+
+    const processSessionCode = (sessionKey: string) => {
+      fetchTastingSession(sessionKey).then((sessionObject) => {
+        setTastingSessionRef(sessionObject);
+        let tastingItems = sessionObject.tastingItems.map((e: TastingItem) => {return e.tastingItemName});
+        setTastingItemNamesRef(tastingItems);
+        console.log(JSON.stringify(tastingItemNames.value));
+
+      }).catch((err) => {
+        console.log("failed to load document in setup!: ", err, sessionKey)
+      })
+    }
+
 
     getSessionKeyFromPreferences().then((preferenceSessionKey: string) => {
-      sessionKey = preferenceSessionKey;
+      setSessionKeyRef(preferenceSessionKey)
+      processSessionCode(sessionKey.value);
       setNeedsActiveSession(false);
       console.log("preferenceSessionKey: ", preferenceSessionKey)
     });
@@ -114,14 +145,14 @@ export default defineComponent({
       sessionKey,
       setNeedsActiveSession,
       needsActiveSessionRef,
+      tastingItemNames,
+      setTastingItemNamesRef,
+      setSessionKeyRef,
     }
   },
   data() {
-    let tastingItems: string[] = []
-
     return {
       sampleTastingItems: ['my favourite whiskey', 'my favourite beer'],
-      tastingItems,
       inputItemListHandlerUpdate: 0,
     };
   },
@@ -131,6 +162,7 @@ export default defineComponent({
         console.log(JSON.stringify(sessionObject));
         this.displayToast();
         this.setNeedsActiveSession(false);
+        setSessionKeyToPreferences(sessionCode)
       }).catch((err) => {
         console.log("failed to load document: ", err)
         this.displayToast(err);
@@ -147,26 +179,29 @@ export default defineComponent({
       this.toastSetOpen(true)
     },
     handleSessionCodeInput(inputValue: string) {
-      this.sessionKey = inputValue;
+      this.setSessionKeyRef(inputValue)
     },
     handleTastingItemAdded(item: string) {
-      this.tastingItems.push(item)
+      this.tastingItemNames.push(item)
     },
     handleTastingItemRename(item: string, index: number) {
-      this.tastingItems[index] = item
+      this.tastingItemNames[index] = item
     },
     handleTastingItemRemoved(index: number) {
-      this.tastingItems.splice(index, 1);
+      this.tastingItemNames.splice(index, 1);
     },
     handleTastingItemReorder(indexFrom: number, indexTo: number) {
-      let movedElement = this.tastingItems[indexFrom];
-      this.tastingItems.splice(indexFrom, 1);
-      this.tastingItems.splice(indexTo, 0, movedElement);
-
-        console.log({b: this.tastingItems.toString()})
+      let movedElement = this.tastingItemNames[indexFrom];
+      this.tastingItemNames.splice(indexFrom, 1);
+      this.tastingItemNames.splice(indexTo, 0, movedElement);
       this.inputItemListHandlerUpdate++;
     },
-
+    submitTastingItems() {
+      const tastingItems: TastingItem[] = this.tastingItemNames.map((item) => {
+        return {tastingItemName: item, ratings: []}
+      });
+      addTastingItems(tastingItems, this.sessionKey);
+    },
   },
 });
 </script>

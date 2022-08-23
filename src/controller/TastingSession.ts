@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import {initializeApp} from "firebase/app";
-import {getFirestore, collection, doc, getDoc, addDoc, deleteDoc, setDoc} from 'firebase/firestore/lite';
-import {TastingSessionConfiguration} from "@/types/TastingSessionConfiguration";
+import {getFirestore, collection, doc, getDoc, addDoc, updateDoc, deleteDoc, setDoc} from 'firebase/firestore/lite';
+import {TastingItem, TastingSession, TastingSessionConfiguration} from "@/types/TastingSessionConfiguration";
 
 const ROOT_COLLECTION_NAME = 'tasting-sessions';
 // Your web app's Firebase configuration
@@ -19,9 +19,13 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 
-export async function createTastingSession(tastingSessionConfig: TastingSessionConfiguration) {
+export async function createTastingSessionConfig(tastingSessionConfig: TastingSessionConfiguration) {
+    const tastingSession: TastingSession = {
+        config: tastingSessionConfig,
+        tastingItems: [],
+    }
     const tastingSessionsCollection = collection(db, ROOT_COLLECTION_NAME);
-    const sessionDocRef = await addDoc(tastingSessionsCollection, tastingSessionConfig)
+    const sessionDocRef = await addDoc(tastingSessionsCollection, tastingSession)
     console.log("document added with id: " + sessionDocRef.id);
     return sessionDocRef.id;
 }
@@ -30,7 +34,6 @@ export async function createTastingSession(tastingSessionConfig: TastingSessionC
 export async function fetchTastingSession(documentId: string): Promise<any> {
     const tastingSessionRef = doc(db, ROOT_COLLECTION_NAME, documentId);
     const tastingSessionSnap = await getDoc(tastingSessionRef);
-
 
     return new Promise<any>((resolve, reject) => {
 
@@ -41,6 +44,10 @@ export async function fetchTastingSession(documentId: string): Promise<any> {
         }
 
     })
+}
 
 
+export async function addTastingItems(tastingItems: TastingItem[], tastingSessionKey: string) {
+    const tastingSessionDoc = doc(db, ROOT_COLLECTION_NAME, tastingSessionKey);
+    await updateDoc(tastingSessionDoc, {tastingItems: tastingItems});
 }

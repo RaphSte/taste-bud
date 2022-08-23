@@ -88,7 +88,7 @@ import router from "@/router";
 import CategorySetup from "@/components/CategorySetup.vue";
 import PreviewComponent from "@/components/ConfigOverview.vue";
 import {TastingSessionConfiguration} from "@/types/TastingSessionConfiguration";
-import {createTastingSession} from "@/controller/TastingSession";
+import {createTastingSessionConfig} from "@/controller/TastingSession";
 import {IonLoading, IonPage, IonContent, IonButton, IonFooter} from "@ionic/vue";
 import {createUserIdAndSaveToLocalStorage} from "@/util/IDUtil";
 
@@ -179,7 +179,7 @@ export default defineComponent({
         categories: this.categories,
       }
 
-      createTastingSession(sessionConfig).then((sessionKey) => {
+      createTastingSessionConfig(sessionConfig).then((sessionKey) => {
         this.$router.push({
           path: `/success/${sessionKey}`
         });

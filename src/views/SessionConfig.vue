@@ -90,7 +90,7 @@ import PreviewComponent from "@/components/ConfigOverview.vue";
 import {TastingSessionConfiguration} from "@/types/TastingSessionConfiguration";
 import {createTastingSessionConfig} from "@/controller/TastingSession";
 import {IonLoading, IonPage, IonContent, IonButton, IonFooter} from "@ionic/vue";
-import {createUserIdAndSaveToLocalStorage} from "@/util/IDUtil";
+import {createUserIdAndSaveToLocalStorage} from "@/util/Utils";
 
 export default defineComponent({
   name: "SessionConfig",

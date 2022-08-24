@@ -9,6 +9,13 @@
       </ion-item>
       <ion-item text-center>
         <ion-text class="ion-text-center">
+          <h1>Tasting</h1>
+          <ion-button color="primary" expand="block" router-link="/">Join</ion-button>
+        </ion-text>
+      </ion-item>
+
+      <ion-item text-center>
+        <ion-text class="ion-text-center">
           <h1>Prepare a tasting session</h1>
           <ion-button color="tertiary" expand="block" router-link="/config">Prepare Tasting Session</ion-button>
         </ion-text>
@@ -16,7 +23,7 @@
       <ion-item text-center>
         <ion-text class="ion-text-center">
           <h1>Add Items to be Tasted</h1>
-          <ion-button color="tertiary" expand="block" router-link="/config/tasting-items">Prepare Tasting Session
+          <ion-button color="tertiary" expand="block" router-link="/config/tasting-items">Add Items
           </ion-button>
         </ion-text>
       </ion-item>

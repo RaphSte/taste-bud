@@ -81,7 +81,7 @@ import {defineComponent, ref} from "vue";
 import {createOutline} from 'ionicons/icons';
 import {Clipboard} from '@capacitor/clipboard';
 
-import {addTastingItems, fetchTastingSession} from "@/controller/TastingSession";
+import {writeTastingItemsToFirestore, fetchTastingSession} from "@/controller/TastingSession";
 import {getSessionKeyFromPreferences, setSessionKeyToPreferences} from "@/controller/LocalStorage";
 
 import {IonButton, IonContent, IonFooter, IonLabel, IonPage, IonText, IonToast} from "@ionic/vue";
@@ -90,6 +90,7 @@ import HeaderComponent from "@/components/HeaderComponent.vue";
 import InputComponent from "@/components/InputComponent.vue";
 import InputItemListHandler from "@/components/InputItemListHandler.vue";
 import {TastingItem} from "@/types/TastingSessionConfiguration";
+import {extractTastingItemNamesFromObject, fetchTastingSessionAndSaveToLocalStorage} from "@/util/Utils";
 
 
 export default defineComponent({
@@ -119,9 +120,9 @@ export default defineComponent({
 
 
     const processSessionCode = (sessionKey: string) => {
-      fetchTastingSession(sessionKey).then((sessionObject) => {
+      fetchTastingSessionAndSaveToLocalStorage(sessionKey).then((sessionObject) => {
         setTastingSessionRef(sessionObject);
-        let tastingItems = sessionObject.tastingItems.map((e: TastingItem) => {return e.tastingItemName});
+        let tastingItems = extractTastingItemNamesFromObject(sessionObject);
         setTastingItemNamesRef(tastingItems);
       }).catch((err) => {
         console.log("failed to load document in setup!: ", err, sessionKey)
@@ -159,12 +160,12 @@ export default defineComponent({
   },
   methods: {
     processSessionCode(sessionCode: string) {
-      fetchTastingSession(sessionCode).then((sessionObject) => {
+      fetchTastingSessionAndSaveToLocalStorage(sessionCode).then((sessionObject) => {
         this.displayToast();
         this.setNeedsActiveSession(false);
         setSessionKeyToPreferences(sessionCode)
         //TODO refactor?
-        this.setTastingItemNamesRef(sessionObject.tastingItems.map((e: TastingItem) => {return e.tastingItemName}));
+        this.setTastingItemNamesRef(extractTastingItemNamesFromObject(sessionObject));
       }).catch((err) => {
         console.log("failed to load document: ", err)
         this.displayToast(err);
@@ -199,10 +200,11 @@ export default defineComponent({
       this.inputItemListHandlerUpdate++;
     },
     submitTastingItems() {
+      //TODO rework! this will overwrite existing ratings, if there are any
       const tastingItems: TastingItem[] = this.tastingItemNames.map((item) => {
         return {tastingItemName: item, ratings: []}
       });
-      addTastingItems(tastingItems, this.sessionKey);
+      writeTastingItemsToFirestore(tastingItems, this.sessionKey);
     },
   },
 });

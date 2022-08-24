@@ -4,15 +4,17 @@
         title="Add Tasting Items"
     />
     <ion-content>
-      <Transition :name="!needsActiveSessionRef ? 'slide-left': 'slide-right'">
+      <Transition :name="getAnimationType()">
         <input-component
             v-if="needsActiveSessionRef"
+            :key="inputComponentUpdate"
             label-text="Enter Your Code Here"
             place-holder="or press the button to copy it "
             description-text="You need to join a session to be able to add items to it. You can do it by entering your session code into the field below"
             :input-value="sessionKey"
             :icon="createOutline"
             @input-registered="handleSessionCodeInput"
+            @custom-icon-clicked="setSessionKeyFromClipboard"
         />
         <div v-else-if="!needsActiveSessionRef">
           <div class="ion-text-center">
@@ -156,6 +158,8 @@ export default defineComponent({
     return {
       sampleTastingItems: ['my favourite whiskey', 'my favourite beer'],
       inputItemListHandlerUpdate: 0,
+      inputComponentUpdate: 0,
+      transitionEnabled: true,
     };
   },
   methods: {
@@ -192,6 +196,21 @@ export default defineComponent({
     },
     handleTastingItemRemoved(index: number) {
       this.tastingItemNames.splice(index, 1);
+    },
+    async setSessionKeyFromClipboard() {
+      let result = await Clipboard.read();
+      this.setSessionKeyRef(result.value);
+      this.transitionEnabled = false;
+      this.inputComponentUpdate++;
+      setTimeout(() => {
+        this.transitionEnabled = true;
+      }, 25)
+    },
+    getAnimationType():string {
+      if(this.transitionEnabled) {
+        return !this.needsActiveSessionRef ? 'slide-left': 'slide-right';
+      }
+      return "no-animation"; //no animation
     },
     handleTastingItemReorder(indexFrom: number, indexTo: number) {
       let movedElement = this.tastingItemNames[indexFrom];

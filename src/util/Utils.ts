@@ -16,6 +16,7 @@ export async function createUserIdAndSaveToLocalStorage(): Promise<string> {
 export async function fetchTastingSessionAndSaveToLocalStorage(sessionCode: string): Promise<TastingSession> {
     return fetchTastingSession(sessionCode).then(sessionObject => {
         setTastingSessionToPreferences(sessionObject).then(r => console.log("tasting session was set to storage"));
+        return sessionObject
     }).catch((err) => {
         return err;
     })

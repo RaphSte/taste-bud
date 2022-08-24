@@ -44,15 +44,11 @@ import {defineComponent, ref} from "vue";
 import {createOutline} from 'ionicons/icons';
 import {Clipboard} from '@capacitor/clipboard';
 
-import {writeTastingItemsToFirestore, fetchTastingSession} from "@/controller/TastingSession";
 import {getSessionKeyFromPreferences, setSessionKeyToPreferences} from "@/controller/LocalStorage";
 
 import {IonButton, IonContent, IonFooter, IonLabel, IonPage, IonText, IonToast} from "@ionic/vue";
 import HeaderComponent from "@/components/HeaderComponent.vue";
 
-import InputComponent from "@/components/InputComponent.vue";
-import InputItemListHandler from "@/components/InputItemListHandler.vue";
-import {TastingItem} from "@/types/TastingSessionConfiguration";
 import {extractTastingItemNamesFromObject, fetchTastingSessionAndSaveToLocalStorage} from "@/util/Utils";
 
 
@@ -118,7 +114,6 @@ export default defineComponent({
     processSessionCode(sessionCode: string) {
       fetchTastingSessionAndSaveToLocalStorage(sessionCode).then((sessionObject) => {
         this.displayToast();
-        this.setNeedsActiveSession(false);
         setSessionKeyToPreferences(sessionCode)
         //TODO refactor?
         this.setTastingItemNamesRef(extractTastingItemNamesFromObject(sessionObject));

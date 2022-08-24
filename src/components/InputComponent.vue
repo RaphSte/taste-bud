@@ -11,13 +11,17 @@
       <ion-item>
         <ion-label position="stacked">{{ labelText }}</ion-label>
         <ion-input
-            :value="sessionNameRef"
+            ref="inputRef"
+            :value="inputValueRef ? inputValueRef : inputValue"
             :placeholder="inputValue !== ''  ? inputValue :placeHolder"
-            v-model="sessionNameRef"
+            v-model="inputValueRef"
             @input="handleInput"
             clear-input
         ></ion-input>
-        <ion-icon class="input-icon" v-if="icon && !sessionNameRef" :icon="icon" @click="setSessionNameFromClipboard"/>
+        <!--                <ion-icon class="input-icon" v-if="icon && !inputValueRef" :icon="icon" @click="setSessionNameFromClipboard"/>-->
+        <ion-icon class="input-icon" v-if="icon && !inputValueRef" :icon="icon"
+                  @click="this.$emit('custom-icon-clicked', inputValueRef)"/>
+
       </ion-item>
     </div>
   </div>
@@ -26,8 +30,7 @@
 
 <script lang="ts">
 import {defineComponent, ref} from "vue";
-import {IonInput, IonItem, IonLabel, IonText, IonIcon,} from "@ionic/vue";
-import {Clipboard} from "@capacitor/clipboard";
+import {IonIcon, IonInput, IonItem, IonLabel, IonText,} from "@ionic/vue";
 
 export default defineComponent({
   name: "InputComponent",
@@ -45,29 +48,24 @@ export default defineComponent({
     }
   },
   setup() {
-    const sessionNameRef = ref("");
-    const setSessionNameRef = (state: string) => sessionNameRef.value = state;
+    const inputValueRef = ref("");
+    const setInputValueRef = (state: string) => inputValueRef.value = state;
     return {
-      sessionNameRef,
-      setSessionNameRef
+      inputValueRef,
+      setInputValueRef,
     }
   },
   mounted() {
     if (this.inputValue) {
-      this.setSessionNameRef(this.inputValue)
+      this.setInputValueRef(this.inputValue)
     }
   },
   methods: {
     handleInput() { //this is a workaround to deal with the performance issues of emitting events
       clearTimeout(this.rerenderTimer)
       this.rerenderTimer = setTimeout(() => {
-        this.$emit('input-registered', this.sessionNameRef)
+        this.$emit('input-registered', this.inputValueRef)
       }, 100);
-    },
-    async setSessionNameFromClipboard() {
-      let result = await Clipboard.read();
-      this.setSessionNameRef(result.value)
-      this.handleInput();
     },
   }
 })

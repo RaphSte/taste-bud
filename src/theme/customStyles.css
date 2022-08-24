@@ -51,6 +51,17 @@
     transform: rotate(90deg);
 }
 
+/*no-animation-workaround*/
+.no-animation-enter-active {
+    transition: all 0s;
+}
+.no-animation-enter-from {
+    opacity: 0;
+}
+.no-animation-leave-to {
+    opacity: 0;
+}
+
 
 .shake {
     animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;

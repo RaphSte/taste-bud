@@ -56,6 +56,7 @@
         collapse="fade"
     >
       <ion-button
+          v-if="needsActiveSessionRef"
           expand="block"
           @click="processSessionCode(sessionKey)"
           class="button-primary"
@@ -63,11 +64,13 @@
         Join
       </ion-button>
       <ion-button
+          v-if="!needsActiveSessionRef"
           expand="block"
           @click="submitTastingItems"
           class="button-primary"
+          router-link="/"
       >
-        submitTastingItems
+        Submit
       </ion-button>
     </ion-footer>
   </ion-page>
@@ -86,7 +89,7 @@ import HeaderComponent from "@/components/HeaderComponent.vue";
 
 import InputComponent from "@/components/InputComponent.vue";
 import InputItemListHandler from "@/components/InputItemListHandler.vue";
-import {TastingItem, TastingSession} from "@/types/TastingSessionConfiguration";
+import {TastingItem} from "@/types/TastingSessionConfiguration";
 
 
 export default defineComponent({

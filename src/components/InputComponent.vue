@@ -1,25 +1,20 @@
 <template>
-  <div>
-    <div class="input-wrapper">
-      <ion-item>
-        <ion-label v-if="labelText" position="stacked">{{ labelText }}</ion-label>
-        <ion-input
-            :value="inputValueRef ? inputValueRef : inputValue"
-            :placeholder="inputValue !== ''  ? inputValue :placeHolder"
-            v-model="inputValueRef"
-            @input="handleInput"
-            :clear-input="clearInput"
-        />
-        <ion-icon
-            :color="iconColor"
-            v-if="!clearInput || icon && !inputValueRef" :icon="icon"
-            class="input-icon"
-            :class="labelText ? 'label-positioning' : 'no-label-positioning'"
-            @click="this.$emit('custom-icon-clicked', inputValueRef)"/>
-      </ion-item>
-    </div>
-  </div>
-
+  <ion-item>
+    <ion-label v-if="labelText" position="stacked">{{ labelText }}</ion-label>
+    <ion-input
+        :value="inputValueRef ? inputValueRef : inputValue"
+        :placeholder="inputValue !== ''  ? inputValue :placeHolder"
+        v-model="inputValueRef"
+        @input="handleInput"
+        :clear-input="clearInput"
+    />
+    <ion-icon
+        v-if="!clearInput || icon && !inputValueRef" :icon="icon"
+        :color="iconColor"
+        class="input-icon"
+        :class="labelText ? 'label-positioning' : 'no-label-positioning'"
+        @click="this.$emit('custom-icon-clicked', inputValueRef)"/>
+  </ion-item>
 </template>
 
 <script lang="ts">
@@ -28,7 +23,7 @@ import {IonIcon, IonInput, IonItem, IonLabel,} from "@ionic/vue";
 
 export default defineComponent({
   name: "InputComponent",
-  components: {IonInput, IonItem, IonLabel, IonIcon,}, //import component to have v-model work
+  components: {IonInput, IonItem, IonLabel, IonIcon,},
   props: {
     labelText: String,
     placeHolder: String,

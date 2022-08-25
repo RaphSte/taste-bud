@@ -3,6 +3,11 @@
     background: transparent;
 }
 
+.element-spacing {
+    margin-right: 10%;
+    margin-left: 10%;
+}
+
 /*custom styling*/
 
 .toolbar-content-center {

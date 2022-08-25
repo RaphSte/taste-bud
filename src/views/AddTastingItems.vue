@@ -5,7 +5,7 @@
     />
     <ion-content>
       <Transition :name="getAnimationType()">
-        <input-component
+        <titled-input-component
             v-if="needsActiveSessionRef"
             :key="inputComponentUpdate"
             label-text="Enter Your Code Here"
@@ -93,13 +93,15 @@ import InputComponent from "@/components/InputComponent.vue";
 import InputItemListHandler from "@/components/InputItemListHandler.vue";
 import {TastingItem} from "@/types/TastingSessionConfiguration";
 import {extractTastingItemNamesFromObject, fetchTastingSessionAndSaveToLocalStorage} from "@/util/Utils";
+import TitledInputComponent from "@/components/TitledInputComponent.vue";
 
 
 export default defineComponent({
   name: "AddTastingItems",
   components: {
+    TitledInputComponent,
     InputItemListHandler,
-    HeaderComponent, IonPage, IonButton, IonToast, InputComponent, IonContent, IonFooter, IonLabel, IonText
+    HeaderComponent, IonPage, IonButton, IonToast,  IonContent, IonFooter, IonLabel, IonText
   },
   setup() {
     const toastIsOpenRef = ref(false);

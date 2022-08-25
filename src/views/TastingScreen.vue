@@ -1,39 +1,51 @@
 <template>
   <ion-page>
     <header-component
-        title="Rating"
+        :title="'Rating: ' + currentTastingItemName"
     />
     <ion-content>
-
-
-      <ion-toast
-          :is-open="toastIsOpenRef"
-          :message="toastMessage"
-          :duration="2500"
-          @didDismiss="toastSetOpen(false)"
-          :color="toastColor"
-      >
-      </ion-toast>
+      <spider-diagram
+          title="Preview"
+          :height="250"
+          :categories="categoriesRef"
+          :series-data="seriesRef"
+          :key="spiderDiagramUpdateRef"
+      />
+      <Transition :name="getAnimationType()">
+        <div v-if="!transitioning">
+          <ion-item class="ion-padding-bottom">
+            <ion-text class="ion-text-center">
+              <h1>{{ categoriesRef[currentCategoryIndex] }}-ness</h1>
+              <p>
+                {{
+                  'How ' + categoriesRef[currentCategoryIndex] + ' is ' + currentTastingItemName + ' for you? Go ahead and rate it!'
+                }}
+              </p>
+            </ion-text>
+          </ion-item>
+          <input-component
+              class="element-spacing"
+              placeHolder="Your Score"
+              input-value="0"
+              :clear-input="false"
+              :icon="send"
+              icon-color="primary"
+              inputMode="numeric"
+              @input-registered="handleScoreInput"
+              @custom-icon-clicked="saveScoreAndProceed"
+          />
+        </div>
+      </Transition>
     </ion-content>
     <ion-footer
         collapse="fade"
     >
       <ion-button
-          v-if="needsActiveSessionRef"
           expand="block"
-          @click="processSessionCode(sessionKey)"
+          @click="saveScoreAndProceed(inputValueRef)"
           class="button-primary"
       >
-        Join
-      </ion-button>
-      <ion-button
-          v-if="!needsActiveSessionRef"
-          expand="block"
-          @click="submitTastingItems"
-          class="button-primary"
-          router-link="/"
-      >
-        Submit
+        Next
       </ion-button>
     </ion-footer>
   </ion-page>
@@ -41,108 +53,107 @@
 
 <script lang="ts">
 import {defineComponent, ref} from "vue";
-import {createOutline} from 'ionicons/icons';
-import {Clipboard} from '@capacitor/clipboard';
+import {send} from 'ionicons/icons';
 
-import {getSessionKeyFromPreferences, setSessionKeyToPreferences} from "@/controller/LocalStorage";
+import {getTastingSessionFromPreferences} from "@/controller/LocalStorage";
 
-import {IonButton, IonContent, IonFooter, IonLabel, IonPage, IonText, IonToast} from "@ionic/vue";
+import {IonButton, IonContent, IonFooter, IonItem, IonPage, IonText} from "@ionic/vue";
 import HeaderComponent from "@/components/HeaderComponent.vue";
-
-import {extractTastingItemNamesFromObject, fetchTastingSessionAndSaveToLocalStorage} from "@/util/Utils";
+import SpiderDiagram from "@/components/SpiderDiagram.vue";
+import {SpiderDiagramSeriesEntry} from "@/types/DiagramTypes";
+import InputComponent from "@/components/InputComponent.vue";
 
 
 export default defineComponent({
   name: "TastingScreen",
   components: {
-    HeaderComponent, IonPage, IonButton, IonToast, IonContent, IonFooter
+    InputComponent,
+    SpiderDiagram,
+    HeaderComponent, IonPage, IonButton, IonContent, IonFooter, IonItem, IonText
   },
   setup() {
-    const toastIsOpenRef = ref(false);
-    const toastSetOpen = (state: boolean) => toastIsOpenRef.value = state;
+    const spiderDiagramUpdateRef = ref(0);
+    const setSpiderDiagramUpdateRef = (state: number) => spiderDiagramUpdateRef.value = state;
 
-    const tastingSessionRef = ref();
-    const setTastingSessionRef = (state: any) => tastingSessionRef.value = state;
-
-    let sessionKey = ref("");
-    const setSessionKeyRef = (state: string) => sessionKey.value = state;
+    const inputValueRef = ref(0);
+    const setInputValueRef = (state: number) => inputValueRef.value = state;
 
 
-    let tastingItems: string[] = []
-    const tastingItemNames = ref(tastingItems);
-    const setTastingItemNamesRef = (state: string[]) => tastingItemNames.value = state;
+    const dataArray: number[] = [];
+    const seriesRef = ref([{
+      name: 'Series 1',
+      data: dataArray,
+    }]);
+    const setSeriesRef = (state: SpiderDiagramSeriesEntry[]) => seriesRef.value = state;
+    const setSeriesValueAtIndex = (index: number, value: number) => seriesRef.value[0].data[index] = value;
 
 
-    const processSessionCode = (sessionKey: string) => {
-      fetchTastingSessionAndSaveToLocalStorage(sessionKey).then((sessionObject) => {
-        setTastingSessionRef(sessionObject);
-        let tastingItems = extractTastingItemNamesFromObject(sessionObject);
-        setTastingItemNamesRef(tastingItems);
-      }).catch((err) => {
-        console.log("failed to load document in setup!: ", err, sessionKey)
-        //TODO error handling
-      })
-    }
+    let categories: string[] = [];
+    const categoriesRef = ref(categories);
+    const setCategoriesRef = (state: string[]) => categoriesRef.value = state;
 
 
-    getSessionKeyFromPreferences().then((preferenceSessionKey: string) => {
-      setSessionKeyRef(preferenceSessionKey)
-      processSessionCode(sessionKey.value);
-
-    });
+    getTastingSessionFromPreferences().then((tastingSession) => {
+      setCategoriesRef(tastingSession.config.categories);
+      categoriesRef.value.forEach(() => seriesRef.value[0].data.push(0));
+      spiderDiagramUpdateRef.value++;
+    }).catch((err) => {
+      console.log(err);
+      //TODO error handling
+    })
 
     return {
-      createOutline,
-      Clipboard,
-      toastIsOpenRef,
-      toastSetOpen,
-      toastColor: "warning",
-      toastMessage: "something went wrong...",
-      sessionKey,
-      tastingItemNames,
-      setTastingItemNamesRef,
-      setSessionKeyRef,
+      seriesRef,
+      setSeriesRef,
+      categoriesRef,
+      setCategoriesRef,
+      spiderDiagramUpdateRef,
+      setSpiderDiagramUpdateRef,
+      setSeriesValueAtIndex,
+      inputValueRef,
+      setInputValueRef,
     }
   },
   data() {
+    let currentTastingItem = 0;
+    let currentTastingItemName = 'My Favourite Beer';
+    //TODO! implement logic! maybe a list to choose the tasting item
+
     return {
-      sampleTastingItems: ['my favourite whiskey', 'my favourite beer'],
-      inputItemListHandlerUpdate: 0,
+      send,
+      previousCategoryIndex: -1,
+      currentCategoryIndex: 0,
+      rerenderTimer: 0,
+      currentTastingItem,
+      currentTastingItemName,
+      transitionEnabled: true,
+      transitioning: false
     };
   },
   methods: {
-    processSessionCode(sessionCode: string) {
-      fetchTastingSessionAndSaveToLocalStorage(sessionCode).then((sessionObject) => {
-        this.displayToast();
-        setSessionKeyToPreferences(sessionCode)
-        //TODO refactor?
-        this.setTastingItemNamesRef(extractTastingItemNamesFromObject(sessionObject));
-      }).catch((err) => {
-        console.log("failed to load document: ", err)
-        this.displayToast(err);
-      })
+    handleScoreInput(score: number) {
+      this.setInputValueRef(score)
+      // clearTimeout(this.rerenderTimer)
+      // this.rerenderTimer = setTimeout(() => {
+      //   this.setSeriesValueAtIndex(this.currentCategoryIndex, score)
+      // }, 600);
+
     },
-    displayToast(errorMessage?: string) {
-      if (!errorMessage) {
-        this.toastColor = "success"
-        this.toastMessage = "joined successful"
-      } else {
-        this.toastColor = "warning"
-        this.toastMessage = errorMessage;
+    saveScoreAndProceed(score: number) {
+      this.setInputValueRef(score)
+      this.setSeriesValueAtIndex(this.currentCategoryIndex, score)
+      this.currentCategoryIndex++
+      this.transitioning = true;
+      setTimeout(() => {
+        this.transitioning = false;
+      }, 200);
+    },
+    getAnimationType(): string {
+      if (this.transitionEnabled) {
+        return this.previousCategoryIndex < this.currentCategoryIndex ? 'slide-left' : 'slide-right';
       }
-      this.toastSetOpen(true)
-    },
-    handleSessionCodeInput(inputValue: string) {
-      this.setSessionKeyRef(inputValue)
-    },
-    handleTastingItemAdded(item: string) {
-      this.tastingItemNames.push(item)
-    },
-    handleTastingItemRename(item: string, index: number) {
-      this.tastingItemNames[index] = item
-    },
-    handleTastingItemRemoved(index: number) {
-      this.tastingItemNames.splice(index, 1);
+      return 'slide-right';
+      //return "no-animation";
     },
   },
 });

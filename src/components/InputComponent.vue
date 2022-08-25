@@ -1,5 +1,7 @@
 <template>
-  <ion-item>
+  <ion-item
+
+  >
     <ion-label v-if="labelText" position="stacked">{{ labelText }}</ion-label>
     <ion-input
         :value="inputValueRef ? inputValueRef : inputValue"
@@ -7,6 +9,7 @@
         v-model="inputValueRef"
         @input="handleInput"
         :clear-input="clearInput"
+        :inputmode="inputMode"
     />
     <ion-icon
         v-if="!clearInput || icon && !inputValueRef" :icon="icon"
@@ -31,15 +34,27 @@ export default defineComponent({
     icon: String,
     clearInput: {type: Boolean, default: false},
     iconColor: {type: String, default: ""},
+    inputMode: {type: String, default: "text"},
+
   },
   data() {
+    //TODO rework sanitize number
+    const sanitizeNumber = (input: any): number => {
+      if (this.inputMode === "numeric" && isNaN(Number(input))) {
+        const sanitizedInput = input.replace(/\D/g, '')
+        return sanitizedInput ? sanitizedInput : 0;
+      } else {
+        return input;
+      }
+    }
     return {
       rerenderTimer: 0,
+      sanitizeNumber,
     }
   },
   setup() {
     const inputValueRef = ref("");
-    const setInputValueRef = (state: string) => inputValueRef.value = state;
+    const setInputValueRef = (state: any) => inputValueRef.value = state;
     return {
       inputValueRef,
       setInputValueRef,
@@ -47,14 +62,15 @@ export default defineComponent({
   },
   mounted() {
     if (this.inputValue) {
-      this.setInputValueRef(this.inputValue)
+      this.setInputValueRef(this.sanitizeNumber(this.inputValue))
     }
   },
   methods: {
     handleInput() { //this is a workaround to deal with the performance issues of emitting events
+      this.setInputValueRef(this.sanitizeNumber(this.inputValueRef));
       clearTimeout(this.rerenderTimer)
       this.rerenderTimer = setTimeout(() => {
-        this.$emit('input-registered', this.inputValueRef)
+        this.$emit('input-registered', this.sanitizeNumber(this.inputValueRef))
       }, 100);
     },
   }
@@ -63,9 +79,14 @@ export default defineComponent({
 
 <style scoped>
 
+ion-input {
+  z-index: 0;
+}
+
 .input-icon {
   position: absolute;
   right: 4%;
+  z-index: 1;
 }
 
 .no-label-positioning {

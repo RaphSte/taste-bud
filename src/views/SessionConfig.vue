@@ -15,7 +15,7 @@
       <Transition :name="goingForward() ? 'slide-left': 'slide-right'">
 
 
-        <input-component
+        <titled-input-component
             v-if="stepCount === 1"
             label-text="Your Name"
             place-holder="Alice"
@@ -24,7 +24,7 @@
             @input-registered="handleCreatorNameInput"
         />
 
-        <input-component
+        <titled-input-component
             v-else-if="stepCount === 2"
             label-text="Name Your Event"
             place-holder="WhiskeyTasing 2022"
@@ -82,22 +82,22 @@
 
 <script lang="ts">
 import ConfigHeader from "@/components/ConfigHeader.vue";
-import InputComponent from "@/components/InputComponent.vue";
 import {defineComponent, ref} from 'vue'
 import router from "@/router";
 import CategorySetup from "@/components/CategorySetup.vue";
 import PreviewComponent from "@/components/ConfigOverview.vue";
 import {TastingSessionConfiguration} from "@/types/TastingSessionConfiguration";
 import {createTastingSessionConfig} from "@/controller/TastingSession";
-import {IonLoading, IonPage, IonContent, IonButton, IonFooter} from "@ionic/vue";
+import {IonButton, IonContent, IonFooter, IonLoading, IonPage} from "@ionic/vue";
 import {createUserIdAndSaveToLocalStorage} from "@/util/Utils";
+import TitledInputComponent from "@/components/TitledInputComponent.vue";
 
 export default defineComponent({
   name: "SessionConfig",
   components: {
+    TitledInputComponent,
     PreviewComponent,
     CategorySetup,
-    InputComponent,
     ConfigHeader,
     IonLoading,
     IonPage,

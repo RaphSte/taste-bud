@@ -5,31 +5,29 @@
         :height="height + 'px'"
         type="radar"
         :options="chartOptions"
-        :series="series"
+        :series="seriesData"
     ></apexchart>
   </div>
 
 </template>
 
-<script>
+<script lang="ts">
 import VueApexCharts from "vue3-apexcharts";
+import {defineComponent} from "vue";
 
-export default {
+export default defineComponent({
   name: "SpiderDiagram",
   props: {
     title: String,
     height: Number,
-    categories: [],
-    seriesData: [],
+    categories: {type: Array<string>},
+    seriesData: {type: Array<any>},
   },
-  el: '#app',
   components: {
     apexchart: VueApexCharts,
   },
   data() {
     return {
-
-      series: this.seriesData,
       chartOptions: {
         chart: {
           height: this.height,
@@ -60,8 +58,7 @@ export default {
     }
 
   },
-
-}
+})
 </script>
 
 <style scoped>

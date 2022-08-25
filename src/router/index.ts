@@ -22,6 +22,10 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/JoinDialog.vue'),
     },
     {
+        path: '/tasting/',
+        component: () => import('@/views/TastingScreen.vue'),
+    },
+    {
         path: '/success/:tastingSessionCode',
         component: () => import('@/views/SubmitSuccess.vue'),
         props: true

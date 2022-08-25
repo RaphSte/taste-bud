@@ -10,7 +10,7 @@
       <ion-item text-center>
         <ion-text class="ion-text-center">
           <h1>Tasting</h1>
-          <ion-button color="primary" expand="block" router-link="/">Join</ion-button>
+          <ion-button color="primary" expand="block" router-link="/tasting">Join</ion-button>
         </ion-text>
       </ion-item>
 

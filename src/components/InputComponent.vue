@@ -28,7 +28,6 @@ export default defineComponent({
     labelText: String,
     placeHolder: String,
     inputValue: String,
-    descriptionText: String,
     icon: String,
     clearInput: {type: Boolean, default: false},
     iconColor: {type: String, default: ""},

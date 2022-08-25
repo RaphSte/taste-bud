@@ -8,33 +8,28 @@
     </ion-item>
 
     <div class="input-wrapper">
-      <ion-item>
-        <ion-label position="stacked">{{ labelText }}</ion-label>
-        <ion-input
-            ref="inputRef"
-            :value="inputValueRef ? inputValueRef : inputValue"
-            :placeholder="inputValue !== ''  ? inputValue :placeHolder"
-            v-model="inputValueRef"
-            @input="handleInput"
-            clear-input
-        ></ion-input>
-        <!--                <ion-icon class="input-icon" v-if="icon && !inputValueRef" :icon="icon" @click="setSessionNameFromClipboard"/>-->
-        <ion-icon class="input-icon" v-if="icon && !inputValueRef" :icon="icon"
-                  @click="this.$emit('custom-icon-clicked', inputValueRef)"/>
-
-      </ion-item>
+      <input-component
+          :labelText="labelText"
+          :input-value="inputValue"
+          :placeHolder="placeHolder"
+          :clear-input="true"
+          :icon="icon"
+          @input-registered="(value) => {this.$emit('input-registered', value)}"
+          @custom-icon-clicked="(value) => {this.$emit('custom-icon-clicked', value)}"
+      />
     </div>
   </div>
 
 </template>
 
 <script lang="ts">
-import {defineComponent, ref} from "vue";
-import {IonIcon, IonInput, IonItem, IonLabel, IonText,} from "@ionic/vue";
+import {defineComponent} from "vue";
+import {IonItem, IonText,} from "@ionic/vue";
+import InputComponent from "@/components/InputComponent.vue";
 
 export default defineComponent({
   name: "TitledInputComponent",
-  components: {IonInput, IonItem, IonLabel, IonText, IonIcon,}, //import component to have v-model work
+  components: {InputComponent, IonItem, IonText,}, //import component to have v-model work
   props: {
     labelText: String,
     placeHolder: String,
@@ -47,27 +42,6 @@ export default defineComponent({
       rerenderTimer: 0,
     }
   },
-  setup() {
-    const inputValueRef = ref("");
-    const setInputValueRef = (state: string) => inputValueRef.value = state;
-    return {
-      inputValueRef,
-      setInputValueRef,
-    }
-  },
-  mounted() {
-    if (this.inputValue) {
-      this.setInputValueRef(this.inputValue)
-    }
-  },
-  methods: {
-    handleInput() { //this is a workaround to deal with the performance issues of emitting events
-      clearTimeout(this.rerenderTimer)
-      this.rerenderTimer = setTimeout(() => {
-        this.$emit('input-registered', this.inputValueRef)
-      }, 100);
-    },
-  }
 })
 </script>
 
@@ -76,12 +50,6 @@ export default defineComponent({
   margin-top: 30%;
   margin-right: 10%;
   margin-left: 10%;
-}
-
-.input-icon {
-  position: absolute;
-  right: 4%;
-  top: 45%;
 }
 
 </style>

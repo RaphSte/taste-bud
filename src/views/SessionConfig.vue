@@ -12,7 +12,7 @@
 
     <ion-content>
 
-      <Transition :name="goingForward() ? 'slide-left': 'slide-right'">
+      <Transition :name="goingForward() ? Animation.SlideLeft: Animation.SlideRight">
 
 
         <titled-input-component

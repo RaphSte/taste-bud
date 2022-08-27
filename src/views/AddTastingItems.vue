@@ -83,25 +83,23 @@ import {defineComponent, ref} from "vue";
 import {createOutline} from 'ionicons/icons';
 import {Clipboard} from '@capacitor/clipboard';
 
-import {writeTastingItemsToFirestore, fetchTastingSession} from "@/controller/TastingSession";
+import {writeTastingItemsToFirestore} from "@/controller/TastingSession";
 import {getSessionKeyFromPreferences, setSessionKeyToPreferences} from "@/controller/LocalStorage";
 
 import {IonButton, IonContent, IonFooter, IonLabel, IonPage, IonText, IonToast} from "@ionic/vue";
 import HeaderComponent from "@/components/HeaderComponent.vue";
-
-import InputComponent from "@/components/InputComponent.vue";
 import InputItemListHandler from "@/components/InputItemListHandler.vue";
 import {TastingItem} from "@/types/TastingSessionConfiguration";
+import {Animation} from "@/types/Animation";
 import {extractTastingItemNamesFromObject, fetchTastingSessionAndSaveToLocalStorage} from "@/util/Utils";
 import TitledInputComponent from "@/components/TitledInputComponent.vue";
-
 
 export default defineComponent({
   name: "AddTastingItems",
   components: {
     TitledInputComponent,
     InputItemListHandler,
-    HeaderComponent, IonPage, IonButton, IonToast,  IonContent, IonFooter, IonLabel, IonText
+    HeaderComponent, IonPage, IonButton, IonToast, IonContent, IonFooter, IonLabel, IonText
   },
   setup() {
     const toastIsOpenRef = ref(false);
@@ -208,9 +206,9 @@ export default defineComponent({
         this.transitionEnabled = true;
       }, 25)
     },
-    getAnimationType():string {
-      if(this.transitionEnabled) {
-        return !this.needsActiveSessionRef ? 'slide-left': 'slide-right';
+    getAnimationType(): string {
+      if (this.transitionEnabled) {
+        return !this.needsActiveSessionRef ? Animation.SlideLeft : Animation.SlideRight;
       }
       return "no-animation"; //no animation
     },

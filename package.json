@@ -27,7 +27,8 @@
     "vue": "^3.2.21",
     "vue-apexcharts": "^1.6.2",
     "vue-router": "^4.0.12",
-    "vue3-apexcharts": "^1.4.1"
+    "vue3-apexcharts": "^1.4.1",
+    "vue3-slider": "^1.8.0"
   },
   "devDependencies": {
     "@capacitor/cli": "^4.0.0",

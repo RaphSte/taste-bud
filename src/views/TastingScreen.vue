@@ -11,7 +11,7 @@
           :series-data="seriesRef"
           :key="spiderDiagramUpdateRef"
       />
-      <Transition :name="getAnimationType()">
+      <Transition :name="transitionEnabled? animationType: Animation.NoAnimation">
         <div v-if="!transitioning">
           <ion-item class="ion-padding-bottom">
             <ion-text class="ion-text-center">
@@ -23,17 +23,44 @@
               </p>
             </ion-text>
           </ion-item>
-          <input-component
-              class="element-spacing"
-              placeHolder="Your Score"
-              input-value="0"
-              :clear-input="false"
-              :icon="send"
-              icon-color="primary"
-              inputMode="numeric"
-              @input-registered="handleScoreInput"
-              @custom-icon-clicked="saveScoreAndProceed"
-          />
+
+          <div class="input-navigation-wrapper">
+            <ion-icon class="navigation-icon" color="medium" :icon="chevronBack"
+                      @click="goToCategoryIndexAndDetermineAnimation(currentCategoryIndex -1 )"></ion-icon>
+
+            <div>
+              <input-component
+                  :key="sliderValue"
+                  class="rating-input"
+                  placeHolder="Your Score"
+                  :input-value="String(sliderValue) "
+                  :clear-input="false"
+                  :icon="send"
+                  icon-color="primary"
+                  inputMode="numeric"
+                  @input-registered="handleScoreInput"
+                  @custom-icon-clicked="saveScoreAndProceed"
+              />
+              <div class="slider-style">
+                <vue3-slider
+                    v-model="sliderValue"
+                    color="#3880ff"
+                    track-color="grey"
+                    :step="1"
+                    :min="0"
+                    :max="10"
+                    :tooltip="true"
+                    :flipTooltip="true"
+                    :alwaysShowHandle="true"
+                    :handleScale="4"
+                    @drag-end="handleScoreInput"
+                />
+              </div>
+            </div>
+            <ion-icon class="navigation-icon" color="medium" :icon="chevronForward"
+                      @click="goToCategoryIndexAndDetermineAnimation(currentCategoryIndex + 1)"></ion-icon>
+          </div>
+
         </div>
       </Transition>
     </ion-content>
@@ -53,23 +80,25 @@
 
 <script lang="ts">
 import {defineComponent, ref} from "vue";
-import {send} from 'ionicons/icons';
+import {chevronBack, chevronForward, send} from 'ionicons/icons';
 
 import {getTastingSessionFromPreferences} from "@/controller/LocalStorage";
 
-import {IonButton, IonContent, IonFooter, IonItem, IonPage, IonText} from "@ionic/vue";
+import {IonButton, IonContent, IonFooter, IonIcon, IonItem, IonPage, IonText,} from "@ionic/vue";
 import HeaderComponent from "@/components/HeaderComponent.vue";
 import SpiderDiagram from "@/components/SpiderDiagram.vue";
 import {SpiderDiagramSeriesEntry} from "@/types/DiagramTypes";
 import InputComponent from "@/components/InputComponent.vue";
-
+import slider from "vue3-slider"
+import {Animation} from "@/types/Animation";
 
 export default defineComponent({
   name: "TastingScreen",
   components: {
     InputComponent,
     SpiderDiagram,
-    HeaderComponent, IonPage, IonButton, IonContent, IonFooter, IonItem, IonText
+    HeaderComponent, IonPage, IonButton, IonContent, IonFooter, IonItem, IonText, IonIcon,
+    "vue3-slider": slider,
   },
   setup() {
     const spiderDiagramUpdateRef = ref(0);
@@ -121,18 +150,23 @@ export default defineComponent({
 
     return {
       send,
+      chevronBack,
+      chevronForward,
       previousCategoryIndex: -1,
       currentCategoryIndex: 0,
       rerenderTimer: 0,
       currentTastingItem,
       currentTastingItemName,
       transitionEnabled: true,
-      transitioning: false
+      transitioning: false,
+      sliderValue: 1,
+      animationType: Animation.NoAnimation,
     };
   },
   methods: {
     handleScoreInput(score: number) {
       this.setInputValueRef(score)
+      this.setSeriesValueAtIndex(this.currentCategoryIndex, score)
       // clearTimeout(this.rerenderTimer)
       // this.rerenderTimer = setTimeout(() => {
       //   this.setSeriesValueAtIndex(this.currentCategoryIndex, score)
@@ -142,18 +176,32 @@ export default defineComponent({
     saveScoreAndProceed(score: number) {
       this.setInputValueRef(score)
       this.setSeriesValueAtIndex(this.currentCategoryIndex, score)
-      this.currentCategoryIndex++
+      this.goToCategoryIndexAndDetermineAnimation(this.currentCategoryIndex + 1);
+      this.resetToDefaultValues();
+    },
+    goToCategoryIndexAndDetermineAnimation(targetIndex: number) {
+
+      if (targetIndex < 0) {
+        this.playTransitionWithAnimation(Animation.SlideLeftNotAllowedShake)
+      } else if (targetIndex > this.categoriesRef.length) {
+        this.playTransitionWithAnimation(Animation.SlideRightNotAllowedShake)
+      } else {
+        this.previousCategoryIndex = this.currentCategoryIndex;
+        this.currentCategoryIndex = targetIndex
+        this.playTransitionWithAnimation(this.previousCategoryIndex < this.currentCategoryIndex ? Animation.SlideLeft : Animation.SlideRight);
+      }
+      this.resetToDefaultValues();
+    },
+    playTransitionWithAnimation(animation: Animation, animationTime = 200) {
+      this.animationType = animation;
+
       this.transitioning = true;
       setTimeout(() => {
         this.transitioning = false;
-      }, 200);
+      }, animationTime);
     },
-    getAnimationType(): string {
-      if (this.transitionEnabled) {
-        return this.previousCategoryIndex < this.currentCategoryIndex ? 'slide-left' : 'slide-right';
-      }
-      return 'slide-right';
-      //return "no-animation";
+    resetToDefaultValues() {
+      this.sliderValue = 1
     },
   },
 });
@@ -161,5 +209,25 @@ export default defineComponent({
 
 <style scoped>
 
+.rating-input {
+  margin: auto;
+  width: 50%;
+}
+
+.input-navigation-wrapper {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  align-items: center;
+}
+
+.navigation-icon {
+  font-size: xx-large;
+  margin: auto;
+}
+
+.slider-style {
+  padding-top: 32px;
+  margin-top: 16px;
+}
 
 </style>

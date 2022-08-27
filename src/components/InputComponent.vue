@@ -30,7 +30,7 @@ export default defineComponent({
   props: {
     labelText: String,
     placeHolder: String,
-    inputValue: String,
+    inputValue: [String, Number],
     icon: String,
     clearInput: {type: Boolean, default: false},
     iconColor: {type: String, default: ""},
@@ -38,18 +38,8 @@ export default defineComponent({
 
   },
   data() {
-    //TODO rework sanitize number
-    const sanitizeNumber = (input: any): number => {
-      if (this.inputMode === "numeric" && isNaN(Number(input))) {
-        const sanitizedInput = input.replace(/\D/g, '')
-        return sanitizedInput ? sanitizedInput : 0;
-      } else {
-        return input;
-      }
-    }
     return {
       rerenderTimer: 0,
-      sanitizeNumber,
     }
   },
   setup() {
@@ -62,15 +52,15 @@ export default defineComponent({
   },
   mounted() {
     if (this.inputValue) {
-      this.setInputValueRef(this.sanitizeNumber(this.inputValue))
+      this.setInputValueRef(this.inputValue)
     }
   },
   methods: {
     handleInput() { //this is a workaround to deal with the performance issues of emitting events
-      this.setInputValueRef(this.sanitizeNumber(this.inputValueRef));
+      this.setInputValueRef(this.inputValueRef);
       clearTimeout(this.rerenderTimer)
       this.rerenderTimer = setTimeout(() => {
-        this.$emit('input-registered', this.sanitizeNumber(this.inputValueRef))
+        this.$emit('input-registered', (this.inputValueRef))
       }, 100);
     },
   }

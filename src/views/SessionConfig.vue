@@ -91,6 +91,7 @@ import {createTastingSessionConfig} from "@/controller/TastingSession";
 import {IonButton, IonContent, IonFooter, IonLoading, IonPage} from "@ionic/vue";
 import {createUserIdAndSaveToLocalStorage} from "@/util/Utils";
 import TitledInputComponent from "@/components/TitledInputComponent.vue";
+import {Animation} from "@/types/Animation";
 
 export default defineComponent({
   name: "SessionConfig",
@@ -126,6 +127,7 @@ export default defineComponent({
       setCategoriesRef,
       timeout: 0, //run forever
       goingForward,
+      Animation
     }
   },
   setup() {

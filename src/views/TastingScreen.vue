@@ -38,6 +38,7 @@
                   :icon="send"
                   icon-color="primary"
                   inputMode="numeric"
+                  :debounceTime="700"
                   @input-registered="handleScoreInput"
                   @custom-icon-clicked="saveScoreAndProceed"
               />
@@ -115,6 +116,7 @@ export default defineComponent({
     }]);
     const setSeriesRef = (state: SpiderDiagramSeriesEntry[]) => seriesRef.value = state;
     const setSeriesValueAtIndex = (index: number, value: number) => seriesRef.value[0].data[index] = value;
+    const getSeriesValueAtIndex = (index: number): number => seriesRef.value[0].data[index]
 
 
     let categories: string[] = [];
@@ -139,6 +141,7 @@ export default defineComponent({
       spiderDiagramUpdateRef,
       setSpiderDiagramUpdateRef,
       setSeriesValueAtIndex,
+      getSeriesValueAtIndex,
       inputValueRef,
       setInputValueRef,
     }
@@ -159,7 +162,7 @@ export default defineComponent({
       currentTastingItemName,
       transitionEnabled: true,
       transitioning: false,
-      sliderValue: 1,
+      sliderValue: 0,
       animationType: Animation.NoAnimation,
     };
   },
@@ -167,11 +170,7 @@ export default defineComponent({
     handleScoreInput(score: number) {
       this.setInputValueRef(score)
       this.setSeriesValueAtIndex(this.currentCategoryIndex, score)
-      // clearTimeout(this.rerenderTimer)
-      // this.rerenderTimer = setTimeout(() => {
-      //   this.setSeriesValueAtIndex(this.currentCategoryIndex, score)
-      // }, 600);
-
+      this.sliderValue = score;
     },
     saveScoreAndProceed(score: number) {
       this.setInputValueRef(score)
@@ -183,7 +182,7 @@ export default defineComponent({
 
       if (targetIndex < 0) {
         this.playTransitionWithAnimation(Animation.SlideLeftNotAllowedShake)
-      } else if (targetIndex > this.categoriesRef.length) {
+      } else if (targetIndex > this.categoriesRef.length -1) {
         this.playTransitionWithAnimation(Animation.SlideRightNotAllowedShake)
       } else {
         this.previousCategoryIndex = this.currentCategoryIndex;
@@ -201,7 +200,7 @@ export default defineComponent({
       }, animationTime);
     },
     resetToDefaultValues() {
-      this.sliderValue = 1
+      this.sliderValue = this.getSeriesValueAtIndex(this.currentCategoryIndex)
     },
   },
 });

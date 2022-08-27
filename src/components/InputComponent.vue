@@ -35,6 +35,7 @@ export default defineComponent({
     clearInput: {type: Boolean, default: false},
     iconColor: {type: String, default: ""},
     inputMode: {type: String, default: "text"},
+    debounceTime: {type: Number, default: 100},
 
   },
   data() {
@@ -61,7 +62,7 @@ export default defineComponent({
       clearTimeout(this.rerenderTimer)
       this.rerenderTimer = setTimeout(() => {
         this.$emit('input-registered', (this.inputValueRef))
-      }, 100);
+      }, this.debounceTime);
     },
   }
 })

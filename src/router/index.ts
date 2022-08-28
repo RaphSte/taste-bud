@@ -19,7 +19,7 @@ const routes: Array<RouteRecordRaw> = [
     },
     {
         path: '/join/',
-        component: () => import('@/views/JoinDialog.vue'),
+        component: () => import('@/views/SessionScreen.vue'),
     },
     {
         path: '/tasting/',
@@ -57,6 +57,12 @@ const routes: Array<RouteRecordRaw> = [
 const router = createRouter({
     history: createWebHistory(process.env.BASE_URL),
     routes
+})
+
+router.afterEach((to, from) => {
+    const toDepth = to.path.substring(1).split('/').length
+    const fromDepth = from.path.substring(1).split('/').length
+    to.meta.transitionName = toDepth < fromDepth ? 'slide-right' : 'slide-left'
 })
 
 export default router

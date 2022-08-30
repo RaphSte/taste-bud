@@ -6,6 +6,7 @@ import {
 } from "@/controller/LocalStorage";
 import {TastingItem, TastingSession} from "@/types/TastingSessionConfiguration";
 import {fetchTastingSession} from "@/controller/TastingSession";
+import {useTastingSessionStore} from "@/util/tastingSessionStore";
 
 
 export async function createUserIdAndSaveToLocalStorage(): Promise<string> {
@@ -16,6 +17,9 @@ export async function createUserIdAndSaveToLocalStorage(): Promise<string> {
 export async function fetchTastingSessionAndSaveToLocalStorage(sessionCode: string): Promise<TastingSession> {
     return fetchTastingSession(sessionCode).then(sessionObject => {
         setTastingSessionToPreferences(sessionObject).then(r => console.log("tasting session was set to storage"));
+        const tastingSessionStore = useTastingSessionStore();
+        tastingSessionStore.$patch({tastingSession: sessionObject})
+
         return sessionObject
     }).catch((err) => {
         return err;

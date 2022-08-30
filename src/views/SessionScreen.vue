@@ -18,7 +18,7 @@
         />
         <div v-else-if="!needsActiveSessionRef">
           <div class="ion-text-center">
-            <ion-label>{{ sessionName }}</ion-label>
+            <ion-label>{{ eventName }}</ion-label>
             <ion-text>
               <p>You are currently participating in >{{ creatorName }}`s&lt; event, by the name
                 of '{{ eventName }}'.</p>
@@ -30,7 +30,7 @@
                 label-text="Ready to jump right in? Go here to start your rating!"
                 button-text="Rating"
                 color-theme="primary"
-                @button-pressed="$router.push({ path: '/tasting' });"
+                @button-pressed="$router.push({ path: '/session/tasting-items/' })"
             />
 
             <labeled-button-item
@@ -38,6 +38,7 @@
                 label-text="Did you bring anything to be rated at this event? Go here to add your items!"
                 button-text="Add Items"
                 color-theme="primary"
+                @button-pressed="$router.push({ path: '/session/add/tasting-items/' })"
             />
 
             <labeled-button-item
@@ -90,6 +91,7 @@ import {Animation} from "@/types/Animation";
 import {extractTastingItemNamesFromObject, fetchTastingSessionAndSaveToLocalStorage} from "@/util/Utils";
 import TitledInputComponent from "@/components/TitledInputComponent.vue";
 import LabeledButtonItem from "@/components/LabeledButtonItem.vue";
+import {useTastingSessionStore} from "@/util/tastingSessionStore";
 
 export default defineComponent({
   name: "SessionScreen",

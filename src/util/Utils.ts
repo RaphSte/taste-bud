@@ -40,11 +40,16 @@ export function extractTastingItemNamesFromObject(session: TastingSession): stri
 
 export function saveItemRatingToStore(itemName: string, categoryName: string, rating: TasteRating) {
     const tastedItems = getTastedItemsFromStore(); //get rating map
-    const itemRatings = tastedItems.get(itemName); //get nested item map
-    const itemRatingsMap = itemRatings ? new Map(JSON.parse(itemRatings)) : new Map<string, TasteRating>(); //parse it to map if exits
+    const itemRatingsMap = getRatingMapForItemFromStore(itemName)
     itemRatingsMap.set(categoryName, rating); //set rating for category
     tastedItems.set(itemName, JSON.stringify(Array.from(itemRatingsMap.entries()))); //serialize back
     saveTastedItemsToStore(tastedItems);
+}
+
+export function getRatingMapForItemFromStore(itemName: string): Map<string, TasteRating> {
+    const tastedItems = getTastedItemsFromStore(); //get rating map
+    const itemRatings = tastedItems.get(itemName); //get nested item map
+    return itemRatings ? new Map(JSON.parse(itemRatings)) : new Map<string, TasteRating>(); //parse it to map if exits
 }
 
 

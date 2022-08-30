@@ -92,7 +92,8 @@ import {SpiderDiagramSeriesEntry} from "@/types/DiagramTypes";
 import InputComponent from "@/components/InputComponent.vue";
 import slider from "vue3-slider"
 import {Animation} from "@/types/Animation";
-import {saveItemRatingToStore} from "@/util/Utils";
+import {getRatingMapForItemFromStore, saveItemRatingToStore} from "@/util/Utils";
+import {TasteRating} from "@/types/TastingSessionConfiguration";
 
 export default defineComponent({
   name: "TastingScreen",
@@ -105,7 +106,7 @@ export default defineComponent({
   props: {
     itemName: {type: String, required: true},
   },
-  setup() {
+  setup(props) {
     const spiderDiagramUpdateRef = ref(0);
     const setSpiderDiagramUpdateRef = (state: number) => spiderDiagramUpdateRef.value = state;
 
@@ -128,14 +129,23 @@ export default defineComponent({
     const setCategoriesRef = (state: string[]) => categoriesRef.value = state;
 
 
-    getTastingSessionFromPreferences().then((tastingSession) => {
-      setCategoriesRef(tastingSession.config.categories);
-      categoriesRef.value.forEach(() => seriesRef.value[0].data.push(0));
-      spiderDiagramUpdateRef.value++;
-    }).catch((err) => {
-      console.log(err);
-      //TODO error handling
-    })
+    const ratingMap = getRatingMapForItemFromStore(props.itemName);
+    ratingMap.forEach((value: TasteRating, key: string) => {
+      categoriesRef.value.push(key);
+      seriesRef.value[0].data.push(value.rating);
+    });
+
+    //TODO do this somewhere else: save and load categories from store, as well as a flag if completed or not
+    if (ratingMap.size === 0) {
+      getTastingSessionFromPreferences().then((tastingSession) => {
+        setCategoriesRef(tastingSession.config.categories);
+        categoriesRef.value.forEach(() => seriesRef.value[0].data.push(0));
+        spiderDiagramUpdateRef.value++;
+      }).catch((err) => {
+        console.log(err);
+        //TODO error handling
+      })
+    }
 
     return {
       seriesRef,
@@ -148,9 +158,18 @@ export default defineComponent({
       getSeriesValueAtIndex,
       inputValueRef,
       setInputValueRef,
+      ratingMap,
     }
   },
   data() {
+
+    let sliderValue = 0;
+
+    //TODO this seems a bit too complicated. => check if there is a better way to set the initial slider value
+    if (this.ratingMap instanceof Map && this.ratingMap.size > 0) { //non-necessary check, but typescript won't compie without it for some reason
+      sliderValue = this.ratingMap.entries().next().value[1].rating;
+    }
+
     return {
       send,
       chevronBack,
@@ -160,7 +179,7 @@ export default defineComponent({
       rerenderTimer: 0,
       transitionEnabled: true,
       transitioning: false,
-      sliderValue: 0,
+      sliderValue,
       animationType: Animation.NoAnimation,
     };
   },

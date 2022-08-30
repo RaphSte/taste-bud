@@ -18,12 +18,21 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/AddTastingItems.vue'),
     },
     {
-        path: '/join/',
+        path: '/session/add/tasting-items/',
+        component: () => import('@/views/AddTastingItems.vue'),
+    },
+    {
+        path: '/session/',
         component: () => import('@/views/SessionScreen.vue'),
     },
     {
-        path: '/tasting/',
+        path: '/session/tasting-items/',
+        component: () => import('@/views/TastingItemSelection.vue'),
+    },
+    {
+        path: '/session/tasting-items/:item/',
         component: () => import('@/views/TastingScreen.vue'),
+        props: true,
     },
     {
         path: '/success/:tastingSessionCode',
@@ -62,7 +71,9 @@ const router = createRouter({
 router.afterEach((to, from) => {
     const toDepth = to.path.substring(1).split('/').length
     const fromDepth = from.path.substring(1).split('/').length
-    to.meta.transitionName = toDepth < fromDepth ? 'slide-right' : 'slide-left'
+    //to.meta.transitionName = toDepth < fromDepth ? 'slide-right' : 'slide-left'
+    //TODO
+    to.meta.transitionName = 'no-animation'
 })
 
 export default router

@@ -1,7 +1,7 @@
 <template>
   <ion-page>
     <header-component
-        :title="'Rating: ' + currentTastingItemName"
+        :title="'Rating: ' + itemName"
     />
     <ion-content>
       <spider-diagram
@@ -18,7 +18,7 @@
               <h1>{{ categoriesRef[currentCategoryIndex] }}-ness</h1>
               <p>
                 {{
-                  'How ' + categoriesRef[currentCategoryIndex] + ' is ' + currentTastingItemName + ' for you? Go ahead and rate it!'
+                  'How ' + categoriesRef[currentCategoryIndex] + ' is ' + itemName + ' for you? Go ahead and rate it!'
                 }}
               </p>
             </ion-text>
@@ -92,6 +92,7 @@ import {SpiderDiagramSeriesEntry} from "@/types/DiagramTypes";
 import InputComponent from "@/components/InputComponent.vue";
 import slider from "vue3-slider"
 import {Animation} from "@/types/Animation";
+import {saveItemRatingToStore} from "@/util/Utils";
 
 export default defineComponent({
   name: "TastingScreen",
@@ -100,6 +101,9 @@ export default defineComponent({
     SpiderDiagram,
     HeaderComponent, IonPage, IonButton, IonContent, IonFooter, IonItem, IonText, IonIcon,
     "vue3-slider": slider,
+  },
+  props: {
+    itemName: {type: String, required: true},
   },
   setup() {
     const spiderDiagramUpdateRef = ref(0);
@@ -147,10 +151,6 @@ export default defineComponent({
     }
   },
   data() {
-    let currentTastingItem = 0;
-    let currentTastingItemName = 'My Favourite Beer';
-    //TODO! implement logic! maybe a list to choose the tasting item
-
     return {
       send,
       chevronBack,
@@ -158,8 +158,6 @@ export default defineComponent({
       previousCategoryIndex: -1,
       currentCategoryIndex: 0,
       rerenderTimer: 0,
-      currentTastingItem,
-      currentTastingItemName,
       transitionEnabled: true,
       transitioning: false,
       sliderValue: 0,
@@ -168,28 +166,38 @@ export default defineComponent({
   },
   methods: {
     handleScoreInput(score: number) {
+      score = Number(score); //workaround to ensure type safety. not sure why the incoming value is treated as string.
       this.setInputValueRef(score)
       this.setSeriesValueAtIndex(this.currentCategoryIndex, score)
       this.sliderValue = score;
     },
     saveScoreAndProceed(score: number) {
+      const currentCategoryName = this.categoriesRef[this.currentCategoryIndex];
+
       this.setInputValueRef(score)
       this.setSeriesValueAtIndex(this.currentCategoryIndex, score)
+
+      saveItemRatingToStore(this.itemName, currentCategoryName, {
+        category: currentCategoryName,
+        rating: this.getSeriesValueAtIndex(this.currentCategoryIndex),
+        ratedBy: 'user',
+      });
+
+
       this.goToCategoryIndexAndDetermineAnimation(this.currentCategoryIndex + 1);
-      this.resetToDefaultValues();
+      this.setSliderToValue(this.currentCategoryIndex);
     },
     goToCategoryIndexAndDetermineAnimation(targetIndex: number) {
-
       if (targetIndex < 0) {
         this.playTransitionWithAnimation(Animation.SlideLeftNotAllowedShake)
-      } else if (targetIndex > this.categoriesRef.length -1) {
+      } else if (targetIndex > this.categoriesRef.length - 1) {
         this.playTransitionWithAnimation(Animation.SlideRightNotAllowedShake)
       } else {
         this.previousCategoryIndex = this.currentCategoryIndex;
         this.currentCategoryIndex = targetIndex
         this.playTransitionWithAnimation(this.previousCategoryIndex < this.currentCategoryIndex ? Animation.SlideLeft : Animation.SlideRight);
       }
-      this.resetToDefaultValues();
+      this.setSliderToValue(this.currentCategoryIndex);
     },
     playTransitionWithAnimation(animation: Animation, animationTime = 200) {
       this.animationType = animation;
@@ -199,8 +207,8 @@ export default defineComponent({
         this.transitioning = false;
       }, animationTime);
     },
-    resetToDefaultValues() {
-      this.sliderValue = this.getSeriesValueAtIndex(this.currentCategoryIndex)
+    setSliderToValue(value: number) {
+      this.sliderValue = this.getSeriesValueAtIndex(value)
     },
   },
 });

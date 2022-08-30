@@ -30,7 +30,7 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/TastingItemSelection.vue'),
     },
     {
-        path: '/session/tasting-items/:item/',
+        path: '/session/tasting-items/:itemName/',
         component: () => import('@/views/TastingScreen.vue'),
         props: true,
     },

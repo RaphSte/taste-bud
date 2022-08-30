@@ -16,10 +16,14 @@
             @keyup.enter="addListItem(listItemName)"
         >
         </ion-input>
-        <ion-text color="danger">
+        <ion-text id="asd" color="danger">
           <p v-if="shakeInputActive">Input cannot be empty!</p>
         </ion-text>
+        <ion-popover trigger="asd" :is-open="shakeInputActive" @didDismiss="popoverOpen = false">
+          <ion-content class="ion-padding">Input cannot be empty!</ion-content>
+        </ion-popover>
       </div>
+
 
       <ion-icon class="input-icon ion-no-margin ion-color ion-color-secondary" slot="end" :icon="addOutline"
                 @click="addListItem(listItemName)"
@@ -54,7 +58,7 @@ import {
   IonLabel,
   IonReorder,
   IonReorderGroup,
-  IonText,
+  IonText, IonPopover, IonContent,
 } from "@ionic/vue";
 import {trash, addOutline, reorderThree} from 'ionicons/icons';
 import {defineComponent, ref} from "vue";
@@ -62,7 +66,7 @@ import {BoolRefSetter} from "@/types/FunctionTypes";
 
 export default defineComponent({
   name: "InputItemListHandler",
-  components: {IonInput, IonItem, IonIcon, IonLabel, IonReorder, IonReorderGroup, IonText},
+  components: {IonInput, IonItem, IonIcon, IonLabel, IonReorder, IonReorderGroup, IonText, IonPopover, IonContent},
   emits: ["list-item-added", "list-item-removed", "list-item-rename", "list-reorder"],
 
   props: {
@@ -95,6 +99,7 @@ export default defineComponent({
       setRotateAddIcon,
       shakeInputActive,
       setShakeInput,
+      popoverOpen: false,
     }
   },
   methods: {
@@ -147,5 +152,22 @@ export default defineComponent({
   top: 25%;
   font-size: x-large;
   padding-left: 8px
+}
+
+/*TODO styling*/
+ion-popover {
+  --background: rgba(40, 173, 218, 0.6);
+  --backdrop-opacity: 0.6;
+  --box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.6);
+  --color: white;
+  --width: 300px;
+}
+
+ion-popover ion-content {
+  --background: rgba(40, 173, 218, 0.6);
+}
+
+ion-popover::part(backdrop) {
+  background-color: rgb(6, 14, 106);
 }
 </style>

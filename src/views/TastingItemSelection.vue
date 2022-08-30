@@ -11,10 +11,12 @@
       </ion-item>
       <div v-for="(item, index) in tastingItems" :key="index">
         <ion-item @click="$router.push({ path: `/session/tasting-items/${item}` })">
+          <ion-icon v-if="!tastedItems.get(item)" :icon="checkmarkSharp"/>
+          <ion-icon v-if="tastedItems.get(item)" color="success" :icon="checkmarkDoneSharp"/>
           <ion-label class="ion-text-center">
             {{ item }}
           </ion-label>
-          <ion-icon :icon="chevronForward"/>
+          <ion-icon color="primary" :icon="chevronForward"/>
         </ion-item>
       </div>
     </ion-content>
@@ -24,11 +26,11 @@
 <script lang="ts">
 import {defineComponent} from "vue";
 import HeaderComponent from "@/components/HeaderComponent.vue";
-import {IonItem, IonLabel, IonPage, IonText, IonContent, IonIcon,} from "@ionic/vue";
-import {useTastingSessionStore} from "@/util/tastingSessionStore";
-import {extractTastingItemNamesFromObject} from "@/util/Utils";
+import {IonContent, IonIcon, IonItem, IonLabel, IonPage, IonText,} from "@ionic/vue";
+import {useTastingSessionStore} from "@/store/tastingSessionStore";
+import {extractTastingItemNamesFromObject, getTastedItemsFromStore, saveItemTastedToStore} from "@/util/Utils";
 import {TastingSession} from "@/types/TastingSessionConfiguration";
-import {chevronForward} from 'ionicons/icons';
+import {checkmarkDoneSharp, checkmarkSharp, chevronForward,} from 'ionicons/icons';
 
 export default defineComponent({
   name: "TastingItemSelection",
@@ -36,19 +38,27 @@ export default defineComponent({
   props: {},
   setup() {
     const tastingSessionStore = useTastingSessionStore();
-    //const session = storeToRefs(tastingSessionStore);
-    const tastingSession = tastingSessionStore.tastingSession
 
-    let tastingItems: string[] = [];
-    console.log("session", tastingSession);
-    if (tastingSession as TastingSession) {
-      tastingItems = extractTastingItemNamesFromObject(tastingSession as TastingSession)
-    }
-    return {tastingItems}
+
+    const tastingSession: TastingSession = tastingSessionStore.tastingSession
+    const tastingItems: string[] = extractTastingItemNamesFromObject(tastingSession);
+
+    // saveItemTastedToStore('b', [{
+    //   category: 'string',
+    //   rating: 420,
+    //   ratedBy: 'string',
+    // }]);
+
+    const tastedItems: Map<string, any> = getTastedItemsFromStore();
+
+
+    return {tastingItems, tastedItems}
   },
   data() {
     return {
       chevronForward,
+      checkmarkSharp,
+      checkmarkDoneSharp,
     }
   }
 })

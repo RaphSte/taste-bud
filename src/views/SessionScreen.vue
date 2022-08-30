@@ -91,7 +91,7 @@ import {Animation} from "@/types/Animation";
 import {extractTastingItemNamesFromObject, fetchTastingSessionAndSaveToLocalStorage} from "@/util/Utils";
 import TitledInputComponent from "@/components/TitledInputComponent.vue";
 import LabeledButtonItem from "@/components/LabeledButtonItem.vue";
-import {useTastingSessionStore} from "@/util/tastingSessionStore";
+import {useTastingSessionStore} from "@/store/tastingSessionStore";
 
 export default defineComponent({
   name: "SessionScreen",

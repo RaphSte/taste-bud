@@ -4,9 +4,10 @@ import {
     setTastingSessionToPreferences,
     setUserIdToPreferences
 } from "@/controller/LocalStorage";
-import {TastingItem, TastingSession} from "@/types/TastingSessionConfiguration";
+import {TasteRating, TastingItem, TastingSession} from "@/types/TastingSessionConfiguration";
 import {fetchTastingSession} from "@/controller/TastingSession";
-import {useTastingSessionStore} from "@/util/tastingSessionStore";
+import {useTastingSessionStore} from "@/store/tastingSessionStore";
+import {useTastedItemsStore} from "@/store/tastedItemsStore";
 
 
 export async function createUserIdAndSaveToLocalStorage(): Promise<string> {
@@ -34,4 +35,23 @@ export function extractTastingItemNamesFromObject(session: TastingSession): stri
     } else {
         return []
     }
+}
+
+
+export function saveItemTastedToStore(item: string, ratings: TasteRating[]) {
+    const tastedItems = getTastedItemsFromStore()
+    tastedItems.set(item, ratings)
+    saveTastedItemsToStore(tastedItems);
+
+}
+
+
+export function saveTastedItemsToStore(map: Map<string, any>) {
+    const tastedItemsStore = useTastedItemsStore();
+    tastedItemsStore.$patch({items: JSON.stringify(Array.from(map.entries()))});
+}
+
+export function getTastedItemsFromStore(): Map<string, any> {
+    const tastedItemsStore = useTastedItemsStore();
+    return tastedItemsStore.items ? new Map(JSON.parse(tastedItemsStore.items)) : new Map<string, any>();
 }

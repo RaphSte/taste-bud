@@ -1,14 +1,14 @@
 <template>
 
   <div class="category-input-handler-wrapper">
-    <ion-item :class="{'shake': shakeInputActive}">
+    <ion-item :class="{'shake': shakeInputActive}" class="ion-margin-bottom">
 
       <ion-label class="ion-padding-start" position="stacked">
         {{ labelText }}
       </ion-label>
       <div class="input-wrapper ion-padding-start ion-margin-end ion-padding-end">
         <ion-input
-            v-if="!shakeInputActive"
+            ref="itemInput"
             inputmode="text"
             v-model="listItemName"
             :placeholder="'such as ' + sampleListItems[listItems.length % sampleListItems.length]"
@@ -16,16 +16,12 @@
             @keyup.enter="addListItem(listItemName)"
         >
         </ion-input>
-        <ion-text id="asd" color="danger">
+        <ion-text color="danger">
           <p v-if="shakeInputActive">Input cannot be empty!</p>
         </ion-text>
-        <ion-popover trigger="asd" :is-open="shakeInputActive" @didDismiss="popoverOpen = false">
-          <ion-content class="ion-padding">Input cannot be empty!</ion-content>
-        </ion-popover>
       </div>
 
-
-      <ion-icon class="input-icon ion-no-margin ion-color ion-color-secondary" slot="end" :icon="addOutline"
+      <ion-icon class="input-icon ion-no-margin ion-color ion-color-primary" slot="end" :icon="addOutline"
                 @click="addListItem(listItemName)"
                 :class="{'rotate-90-degrees': rotateAddIcon}"
       />
@@ -51,22 +47,14 @@
 </template>
 
 <script lang="ts">
-import {
-  IonInput,
-  IonItem,
-  IonIcon,
-  IonLabel,
-  IonReorder,
-  IonReorderGroup,
-  IonText, IonPopover, IonContent,
-} from "@ionic/vue";
-import {trash, addOutline, reorderThree} from 'ionicons/icons';
+import {IonIcon, IonInput, IonItem, IonLabel, IonReorder, IonReorderGroup, IonText,} from "@ionic/vue";
+import {addOutline, reorderThree, trash} from 'ionicons/icons';
 import {defineComponent, ref} from "vue";
 import {BoolRefSetter} from "@/types/FunctionTypes";
 
 export default defineComponent({
   name: "InputItemListHandler",
-  components: {IonInput, IonItem, IonIcon, IonLabel, IonReorder, IonReorderGroup, IonText, IonPopover, IonContent},
+  components: {IonInput, IonItem, IonIcon, IonLabel, IonReorder, IonReorderGroup, IonText},
   emits: ["list-item-added", "list-item-removed", "list-item-rename", "list-reorder"],
 
   props: {
@@ -82,6 +70,18 @@ export default defineComponent({
     }
   },
   data() {
+
+    setTimeout(() => {
+      // this whole thing is jank af but gets the job done. Only a workaround bc ionics built in autofocus flag doesn't work
+      try {
+        let a: any = this.$refs.itemInput;
+        a = a.$el;
+        a.setFocus()
+      } catch (e) {
+        console.log("failed to set focus: ", e)
+      }
+    }, 200);
+
     const rotateAddIcon = ref(false)
     const setRotateAddIcon: BoolRefSetter = (state: boolean) => {
       rotateAddIcon.value = state
@@ -143,7 +143,7 @@ export default defineComponent({
 .input-icon {
   position: absolute;
   right: 4%;
-  bottom: 4px;
+  top: 18px;
   font-size: xx-large;
 }
 
@@ -154,20 +154,4 @@ export default defineComponent({
   padding-left: 8px
 }
 
-/*TODO styling*/
-ion-popover {
-  --background: rgba(40, 173, 218, 0.6);
-  --backdrop-opacity: 0.6;
-  --box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.6);
-  --color: white;
-  --width: 300px;
-}
-
-ion-popover ion-content {
-  --background: rgba(40, 173, 218, 0.6);
-}
-
-ion-popover::part(backdrop) {
-  background-color: rgb(6, 14, 106);
-}
 </style>

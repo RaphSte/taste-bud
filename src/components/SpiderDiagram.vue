@@ -22,11 +22,12 @@ export default defineComponent({
     height: Number,
     categories: {type: Array<string>},
     seriesData: {type: Array<any>},
+    showToolbar: {type: Boolean, default: false},
   },
   components: {
     apexchart: VueApexCharts,
   },
-  data() {
+  data(props) {
     return {
       chartOptions: {
         chart: {
@@ -37,7 +38,10 @@ export default defineComponent({
             blur: 1,
             left: 1,
             top: 1
-          }
+          },
+          toolbar: {
+            show: props.showToolbar
+          },
         },
         title: {
           text: this.title

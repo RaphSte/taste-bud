@@ -5,11 +5,11 @@
     />
     <ion-content>
       <spider-diagram
-          title="Preview"
           :height="250"
           :categories="categoriesRef"
           :series-data="seriesRef"
           :key="spiderDiagramUpdateRef"
+          class="spider-diagram"
       />
       <Transition :name="transitionEnabled? animationType: Animation.NoAnimation">
         <div v-if="!transitioning">
@@ -254,6 +254,11 @@ export default defineComponent({
 .slider-style {
   padding-top: 32px;
   margin-top: 16px;
+}
+
+.spider-diagram{
+  margin-bottom: -40px;
+  margin-top: -15px;
 }
 
 </style>

@@ -88,10 +88,13 @@ import {IonButton, IonContent, IonFooter, IonLabel, IonPage, IonText, IonToast} 
 import HeaderComponent from "@/components/HeaderComponent.vue";
 import {TastingSession} from "@/types/TastingSessionConfiguration";
 import {Animation} from "@/types/Animation";
-import {extractTastingItemNamesFromObject, fetchTastingSessionAndSaveToLocalStorage} from "@/util/Utils";
+import {
+  extractTastingItemNamesFromObject,
+  fetchTastingSessionAndSaveToLocalStorage,
+  setSessionKeyToStore
+} from "@/util/Utils";
 import TitledInputComponent from "@/components/TitledInputComponent.vue";
 import LabeledButtonItem from "@/components/LabeledButtonItem.vue";
-import {useTastingSessionStore} from "@/store/tastingSessionStore";
 
 export default defineComponent({
   name: "SessionScreen",
@@ -183,6 +186,7 @@ export default defineComponent({
         this.displayToast();
         this.setNeedsActiveSession(false);
         setSessionKeyToPreferences(sessionCode)
+        setSessionKeyToStore(sessionCode);
         //TODO refactor?
         this.setTastingItemNamesRef(extractTastingItemNamesFromObject(sessionObject));
       }).catch((err) => {

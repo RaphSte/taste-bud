@@ -10,6 +10,7 @@ export const useTastingSessionStore = defineStore('tastingSessionStore', {
                 categories: [],
             },
             tastingItems: [],
-        }
+        },
+        sessionKey: '',
     }),
 })

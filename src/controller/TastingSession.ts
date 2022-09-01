@@ -49,5 +49,5 @@ export async function fetchTastingSession(documentId: string): Promise<any> {
 
 export async function writeTastingItemsToFirestore(tastingItems: TastingItem[], tastingSessionKey: string) {
     const tastingSessionDoc = doc(db, ROOT_COLLECTION_NAME, tastingSessionKey);
-    await updateDoc(tastingSessionDoc, {tastingItems: tastingItems});
+    return  updateDoc(tastingSessionDoc, {tastingItems: tastingItems});
 }

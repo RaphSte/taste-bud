@@ -42,7 +42,7 @@ export function extractTastingItemNamesFromObject(session: TastingSession): stri
 
 
 export function saveItemRatingToStore(itemName: string, categoryName: string, rating: TasteRating) {
-    const tastedItems = getTastedItemsFromStore(); //get tastingItem map
+    const tastedItems = getTastingItemsFromStore(); //get tastingItem map
     const itemRatingsMap = getRatingMapForItemFromStore(itemName)
     itemRatingsMap.set(categoryName, rating); //set rating for category
     tastedItems.set(itemName, JSON.stringify(Array.from(itemRatingsMap.entries()))); //serialize back
@@ -50,7 +50,7 @@ export function saveItemRatingToStore(itemName: string, categoryName: string, ra
 }
 
 export function getRatingMapForItemFromStore(itemName: string): Map<string, TasteRating> {
-    const tastingItems = getTastedItemsFromStore(); //get tastingItem map
+    const tastingItems = getTastingItemsFromStore(); //get tastingItem map
     const itemRatings = tastingItems.get(itemName); //get nested item map
     return itemRatings ? new Map(JSON.parse(itemRatings)) : new Map<string, TasteRating>(); //parse it to map if exits
 }
@@ -61,7 +61,7 @@ export function saveTastedItemsToStore(map: Map<string, any>) {
     tastedItemsStore.$patch({items: JSON.stringify(Array.from(map.entries()))});
 }
 
-export function getTastedItemsFromStore(): Map<string, any> {
+export function getTastingItemsFromStore(): Map<string, any> {
     const tastedItemsStore = useTastedItemsStore();
     return tastedItemsStore.items ? new Map(JSON.parse(tastedItemsStore.items)) : new Map<string, any>();
 }
@@ -89,26 +89,33 @@ export function setSessionKeyToStore(sessionKey: string) {
  * */
 export function updateTastingItems(tastingItemNames: string[]) {
 
-    const tastingItemMap = getTastedItemsFromStore();
+    const tastingItemMap = getTastingItemsFromStore();
 
     tastingItemNames.forEach((itemName) => {
         if (!tastingItemMap.has(itemName)) {
             tastingItemMap.set(itemName, JSON.stringify(Array.from(new Map<string, TastingItem>)))
         }
     });
-
-
-    const tastingItems: TastingItem[] = Array.from(tastingItemMap, ([name, value]) => ({
-        tastingItemName: name,
-        ratings: extractRatingsFromValue(value),
-    }));
-
-
+    const tastingItems: TastingItem[] = convertTastingItemMapToArray(tastingItemMap);
     writeTastingItemsToFirestore(tastingItems, getSessionKey());
 }
 
-function extractRatingsFromValue(value: any): TasteRating[] {
 
+export function submitRatingFromStoreToFirestore() {
+    const tastingItemMap = getTastingItemsFromStore();
+    const tastingItems: TastingItem[] = convertTastingItemMapToArray(tastingItemMap);
+    return writeTastingItemsToFirestore(tastingItems, getSessionKey());
+}
+
+
+function extractRatingsFromValue(value: any): TasteRating[] {
     const arr = JSON.parse(value);
     return arr.map((value: any) => value[1]);
+}
+
+function convertTastingItemMapToArray(tastingItemMap: Map<string, TastingItem>): TastingItem[] {
+    return Array.from(tastingItemMap, ([name, value]) => ({
+        tastingItemName: name,
+        ratings: extractRatingsFromValue(value),
+    }));
 }

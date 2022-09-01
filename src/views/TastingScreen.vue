@@ -13,7 +13,7 @@
       />
       <Transition :name="transitionEnabled? animationType: Animation.NoAnimation">
         <div v-if="!transitioning">
-          <ion-item class="ion-padding-bottom">
+          <ion-item v-if="currentCategoryIndex !== categoriesRef.length" class="ion-padding-bottom">
             <ion-text class="ion-text-center">
               <h1>{{ categoriesRef[currentCategoryIndex] }}-ness</h1>
               <p>
@@ -28,7 +28,7 @@
             <ion-icon class="navigation-icon" color="medium" :icon="chevronBack"
                       @click="goToCategoryIndexAndDetermineAnimation(currentCategoryIndex -1 )"></ion-icon>
 
-            <div>
+            <div v-if="currentCategoryIndex !== categoriesRef.length">
               <input-component
                   :key="sliderValue"
                   class="rating-input"
@@ -58,8 +58,21 @@
                 />
               </div>
             </div>
-            <ion-icon class="navigation-icon" color="medium" :icon="chevronForward"
-                      @click="goToCategoryIndexAndDetermineAnimation(currentCategoryIndex + 1)"></ion-icon>
+            <ion-item v-if="currentCategoryIndex === categoriesRef.length" class="ion-padding-bottom">
+              <ion-text class="ion-text-center">
+                <h2>Wrap up</h2>
+                <p>
+                  This is your rating for {{ itemName }}. If everything is correct you can go ahead and submit your
+                  rating.
+                </p>
+              </ion-text>
+            </ion-item>
+
+
+            <ion-icon
+                v-if="currentCategoryIndex !== categoriesRef.length"
+                class="navigation-icon" color="medium" :icon="chevronForward"
+                @click="goToCategoryIndexAndDetermineAnimation(currentCategoryIndex + 1)"/>
           </div>
 
         </div>
@@ -69,11 +82,20 @@
         collapse="fade"
     >
       <ion-button
+          v-if="currentCategoryIndex !== categoriesRef.length"
           expand="block"
           @click="saveScoreAndProceed(inputValueRef)"
           class="button-primary"
       >
         Next
+      </ion-button>
+      <ion-button
+          v-if="currentCategoryIndex === categoriesRef.length"
+          expand="block"
+          @click="submitRating()"
+          class="button-primary"
+      >
+        Submit
       </ion-button>
     </ion-footer>
   </ion-page>
@@ -92,7 +114,7 @@ import {SpiderDiagramSeriesEntry} from "@/types/DiagramTypes";
 import InputComponent from "@/components/InputComponent.vue";
 import slider from "vue3-slider"
 import {Animation} from "@/types/Animation";
-import {getRatingMapForItemFromStore, saveItemRatingToStore} from "@/util/Utils";
+import {getRatingMapForItemFromStore, saveItemRatingToStore, submitRatingFromStoreToFirestore} from "@/util/Utils";
 import {TasteRating} from "@/types/TastingSessionConfiguration";
 
 export default defineComponent({
@@ -209,7 +231,7 @@ export default defineComponent({
     goToCategoryIndexAndDetermineAnimation(targetIndex: number) {
       if (targetIndex < 0) {
         this.playTransitionWithAnimation(Animation.SlideLeftNotAllowedShake)
-      } else if (targetIndex > this.categoriesRef.length - 1) {
+      } else if (targetIndex > this.categoriesRef.length) {
         this.playTransitionWithAnimation(Animation.SlideRightNotAllowedShake)
       } else {
         this.previousCategoryIndex = this.currentCategoryIndex;
@@ -229,6 +251,17 @@ export default defineComponent({
     setSliderToValue(value: number) {
       this.sliderValue = this.getSeriesValueAtIndex(value)
     },
+    submitRating() {
+      submitRatingFromStoreToFirestore().then(() => {
+        //TODO loading indicator
+        //TODO show success msg to user
+        console.log("submitted rating successfully")
+        this.$router.go(-1);
+      }).catch((e) => {
+        //TODO error handling
+        console.log("error while submitting rating: ", e)
+      });
+    }
   },
 });
 </script>
@@ -256,7 +289,7 @@ export default defineComponent({
   margin-top: 16px;
 }
 
-.spider-diagram{
+.spider-diagram {
   margin-bottom: -40px;
   margin-top: -15px;
 }

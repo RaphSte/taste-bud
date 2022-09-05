@@ -9,12 +9,12 @@
       </ion-item>
 
 
-<!--      <ion-item text-center>-->
-<!--        <ion-text class="ion-text-center">-->
-<!--          <h1>Tasting</h1>-->
-<!--          <ion-button color="primary" expand="block" router-link="/tasting/">Join</ion-button>-->
-<!--        </ion-text>-->
-<!--      </ion-item>-->
+      <!--      <ion-item text-center>-->
+      <!--        <ion-text class="ion-text-center">-->
+      <!--          <h1>Tasting</h1>-->
+      <!--          <ion-button color="primary" expand="block" router-link="/tasting/">Join</ion-button>-->
+      <!--        </ion-text>-->
+      <!--      </ion-item>-->
 
       <ion-item text-center>
         <ion-text class="ion-text-center">
@@ -24,14 +24,13 @@
       </ion-item>
 
 
-  <!--      <ion-item text-center>-->
-  <!--        <ion-text class="ion-text-center">-->
-  <!--          <h1>Add Items to be Tasted</h1>-->
-  <!--          <ion-button color="tertiary" expand="block" router-link="/config/tasting-items/">Add Items-->
-  <!--          </ion-button>-->
-  <!--        </ion-text>-->
-  <!--      </ion-item>-->
-
+      <!--      <ion-item text-center>-->
+      <!--        <ion-text class="ion-text-center">-->
+      <!--          <h1>Add Items to be Tasted</h1>-->
+      <!--          <ion-button color="tertiary" expand="block" router-link="/config/tasting-items/">Add Items-->
+      <!--          </ion-button>-->
+      <!--        </ion-text>-->
+      <!--      </ion-item>-->
 
     </ion-content>
   </ion-page>
@@ -39,12 +38,16 @@
 
 <script lang="ts">
 import {defineComponent} from "vue";
-import {IonButton, IonPage, IonText, IonItem, IonContent} from '@ionic/vue';
+import {IonButton, IonContent, IonItem, IonPage, IonText} from '@ionic/vue';
+import {loadOrCreateUserId} from "@/util/Utils";
 
 
 export default defineComponent({
   name: "HomeScreen",
   components: {IonButton, IonPage, IonText, IonItem, IonContent},
+  setup() {
+    loadOrCreateUserId();
+  }
 })
 </script>
 

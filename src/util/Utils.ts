@@ -13,12 +13,30 @@ import {
 } from "@/controller/TastingSession";
 import {useTastingSessionStore} from "@/store/tastingSessionStore";
 import {useTastedItemsStore} from "@/store/tastedItemsStore";
+import {useUserStore} from "@/store/userStore";
+import {storeToRefs} from "pinia";
 
 
 export async function createUserIdAndSaveToLocalStorage(): Promise<string> {
     await setUserIdToPreferences(uuidv4())
     return getUserIdFromPreferences() //to make sure the id was set
 }
+
+export function loadOrCreateUserId() {
+    const userStore = useUserStore();
+    if (!userStore.userId) {
+        getUserIdFromPreferences().then(id => userStore.$patch({userId: id})).catch(reason => {
+            if (reason === 'No uid found') {
+                userStore.$patch({userId: uuidv4()})
+            } else {
+                console.log(reason)
+            }
+        });
+    }
+    const {userId} = storeToRefs(userStore);
+    return userId
+}
+
 
 export async function fetchTastingSessionAndSaveToLocalStorage(sessionCode: string): Promise<TastingSession> {
     return fetchTastingSession(sessionCode).then(sessionObject => {

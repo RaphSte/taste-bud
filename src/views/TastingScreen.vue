@@ -115,7 +115,7 @@ import InputComponent from "@/components/InputComponent.vue";
 import slider from "vue3-slider"
 import {Animation} from "@/types/Animation";
 import {
-  getRatingMapForItemFromStore,
+  getRatingMapForItemFromStore, loadOrCreateUserId,
   saveItemRatingToStore,
   submitRatingFromStoreToFirestore,
   tasteRatingExistsFor
@@ -174,6 +174,8 @@ export default defineComponent({
       })
     }
 
+    const userId = loadOrCreateUserId();
+
     return {
       seriesRef,
       setSeriesRef,
@@ -186,6 +188,7 @@ export default defineComponent({
       inputValueRef,
       setInputValueRef,
       ratingMap,
+      userId,
     }
   },
   data() {
@@ -234,7 +237,7 @@ export default defineComponent({
         saveItemRatingToStore(this.tastingItemName, this.currentTastingCategoryName, {
           category: this.currentTastingCategoryName,
           rating: this.getSeriesValueAtIndex(this.currentCategoryIndex),
-          ratedBy: 'user',
+          ratedBy: this.userId,
         });
       }
 

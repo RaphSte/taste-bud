@@ -15,6 +15,7 @@ import {useTastingSessionStore} from "@/store/tastingSessionStore";
 import {useTastedItemsStore} from "@/store/tastedItemsStore";
 import {useUserStore} from "@/store/userStore";
 import {storeToRefs} from "pinia";
+import {Ref} from "vue";
 
 
 export async function createUserIdAndSaveToLocalStorage(): Promise<string> {
@@ -22,7 +23,7 @@ export async function createUserIdAndSaveToLocalStorage(): Promise<string> {
     return getUserIdFromPreferences() //to make sure the id was set
 }
 
-export function loadOrCreateUserId() {
+export function loadOrCreateUserId(): Ref<string> {
     const userStore = useUserStore();
     if (!userStore.userId) {
         getUserIdFromPreferences().then(id => userStore.$patch({userId: id})).catch(reason => {
@@ -152,7 +153,10 @@ export function submitRatingFromStoreToFirestore(tastingItemName: string) {
     const tastedItemMap = getTastedItemsFromStore();
     const nestedArray = Array.from(JSON.parse(tastedItemMap.get(tastingItemName)));
     const tasteRatings: TasteRating[] = nestedArray.map((value: any) => value[1]);
-    return writeTasteRatingsToFirestore(tasteRatings, tastingItemName, getSessionKey());
+
+    const userStore = useUserStore();
+
+    return writeTasteRatingsToFirestore(tasteRatings, tastingItemName, getSessionKey(), userStore.userId);
 }
 
 

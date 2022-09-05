@@ -7,6 +7,7 @@ import {
     TastingSession,
     TastingSessionConfiguration
 } from "@/types/TastingSessionConfiguration";
+import {skipHydrate} from "pinia";
 
 const ROOT_COLLECTION_NAME = 'tasting-sessions';
 const TASTING_ITEM_COLLECTION_NAME = 'tasting-items';
@@ -75,16 +76,28 @@ export async function writeTastingItemsToFirestore(tastingItems: TastingItem[], 
 // }
 
 
-export async function writeTasteRatingsToFirestore(ratings: TasteRating[], itemName: string, tastingSessionKey: string) {
+export async function writeTasteRatingsToFirestore(ratings: TasteRating[], itemName: string, tastingSessionKey: string, userId: string) {
     const tastingSessionDoc = doc(db, ROOT_COLLECTION_NAME, tastingSessionKey);
 
+
+    // const ratingsObject: any = {[userId]: {}};
+    // ratings.forEach((rating: TasteRating) => {
+    //     ratingsObject[userId][rating.category] = rating;
+    // });
 
     const ratingsObject: any = {};
     ratings.forEach((rating: TasteRating) => {
         ratingsObject[rating.category] = rating;
     });
-    return updateDoc(tastingSessionDoc, {[TASTING_ITEMS_FIELD_NAME + '.' + itemName + '.' + TASTE_RATINGS_FIELD_NAME]: ratingsObject});
 
+
+    //return updateDoc(tastingSessionDoc, {[TASTING_ITEMS_FIELD_NAME + '.' + itemName + '.' + TASTE_RATINGS_FIELD_NAME]: ratingsObject});
+
+    console.log(ratingsObject)
+
+    return updateDoc(tastingSessionDoc, {
+        [TASTING_ITEMS_FIELD_NAME + '.' + itemName + '.' + TASTE_RATINGS_FIELD_NAME + '.' + userId]: ratingsObject
+    });
 
     // ratings.forEach((rating: TasteRating) => {
     //     const tasteRatingCollection = doc(db, ROOT_COLLECTION_NAME, tastingSessionKey, TASTING_ITEM_COLLECTION_NAME, itemName, RATING_COLLECTION_NAME, rating.category);

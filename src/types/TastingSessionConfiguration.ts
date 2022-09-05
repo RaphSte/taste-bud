@@ -12,6 +12,7 @@ export type TastingSessionConfiguration = {
 
 export type TastingItem = {
     tastingItemName: string,
+    index: number,
     ratings: TasteRating[],
 }
 

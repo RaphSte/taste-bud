@@ -68,7 +68,7 @@
       <ion-button
           v-if="needsActiveSessionRef"
           expand="block"
-          @click="processSessionCode(sessionKey)"
+          @click="joinNewSession(sessionKey)"
           class="button-primary"
       >
         Join
@@ -95,6 +95,8 @@ import {
 } from "@/util/Utils";
 import TitledInputComponent from "@/components/TitledInputComponent.vue";
 import LabeledButtonItem from "@/components/LabeledButtonItem.vue";
+import {useTastedItemsStore} from "@/store/tastedItemsStore";
+import {useTastingSessionStore} from "@/store/tastingSessionStore";
 
 export default defineComponent({
   name: "SessionScreen",
@@ -193,6 +195,13 @@ export default defineComponent({
         console.log("failed to load document: ", err)
         this.displayToast(err);
       })
+    },
+    joinNewSession(sessionCode: string) {
+      const tastingSessionStore = useTastingSessionStore();
+      tastingSessionStore.$reset();
+      const store = useTastedItemsStore();
+      store.$reset();
+      this.processSessionCode(sessionCode);
     },
     displayToast(errorMessage?: string) {
       if (!errorMessage) {

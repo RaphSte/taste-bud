@@ -28,7 +28,7 @@ import {defineComponent} from "vue";
 import HeaderComponent from "@/components/HeaderComponent.vue";
 import {IonContent, IonIcon, IonItem, IonLabel, IonPage, IonText,} from "@ionic/vue";
 import {useTastingSessionStore} from "@/store/tastingSessionStore";
-import {extractTastingItemNamesFromObject, getTastingItemsFromStore, saveItemRatingToStore} from "@/util/Utils";
+import {extractTastingItemNamesFromObject, getTastedItemsFromStore} from "@/util/Utils";
 import {TastingSession} from "@/types/TastingSessionConfiguration";
 import {checkmarkDoneSharp, checkmarkSharp, chevronForward,} from 'ionicons/icons';
 
@@ -41,7 +41,7 @@ export default defineComponent({
 
     const tastingSession: TastingSession = tastingSessionStore.tastingSession
     const tastingItems: string[] = extractTastingItemNamesFromObject(tastingSession);
-    const tastedItems: Map<string, any> = getTastingItemsFromStore();
+    const tastedItems: Map<string, any> = getTastedItemsFromStore();
 
     return {tastingItems, tastedItems}
   },

@@ -1,7 +1,7 @@
 <template>
   <ion-page>
     <header-component
-        :title="'Rating: ' + itemName"
+        :title="'Rating: ' + tastingItemName"
     />
     <ion-content>
       <spider-diagram
@@ -18,7 +18,7 @@
               <h1>{{ categoriesRef[currentCategoryIndex] }}-ness</h1>
               <p>
                 {{
-                  'How ' + categoriesRef[currentCategoryIndex] + ' is ' + itemName + ' for you? Go ahead and rate it!'
+                  'How ' + this.currentTastingCategoryName + ' is ' + tastingItemName + ' for you? Go ahead and rate it!'
                 }}
               </p>
             </ion-text>
@@ -62,7 +62,7 @@
               <ion-text class="ion-text-center">
                 <h2>Wrap up</h2>
                 <p>
-                  This is your rating for {{ itemName }}. If everything is correct you can go ahead and submit your
+                  This is your rating for {{ tastingItemName }}. If everything is correct you can go ahead and submit your
                   rating.
                 </p>
               </ion-text>
@@ -72,7 +72,7 @@
             <ion-icon
                 v-if="currentCategoryIndex !== categoriesRef.length"
                 class="navigation-icon" color="medium" :icon="chevronForward"
-                @click="goToCategoryIndexAndDetermineAnimation(currentCategoryIndex + 1)"/>
+                @click="saveScoreAndProceed(inputValueRef)"/>
           </div>
 
         </div>
@@ -114,7 +114,12 @@ import {SpiderDiagramSeriesEntry} from "@/types/DiagramTypes";
 import InputComponent from "@/components/InputComponent.vue";
 import slider from "vue3-slider"
 import {Animation} from "@/types/Animation";
-import {getRatingMapForItemFromStore, saveItemRatingToStore, submitRatingFromStoreToFirestore} from "@/util/Utils";
+import {
+  getRatingMapForItemFromStore,
+  saveItemRatingToStore,
+  submitRatingFromStoreToFirestore,
+  tasteRatingExistsFor
+} from "@/util/Utils";
 import {TasteRating} from "@/types/TastingSessionConfiguration";
 
 export default defineComponent({
@@ -126,7 +131,7 @@ export default defineComponent({
     "vue3-slider": slider,
   },
   props: {
-    itemName: {type: String, required: true},
+    tastingItemName: {type: String, required: true},
   },
   setup(props) {
     const spiderDiagramUpdateRef = ref(0);
@@ -151,7 +156,7 @@ export default defineComponent({
     const setCategoriesRef = (state: string[]) => categoriesRef.value = state;
 
 
-    const ratingMap = getRatingMapForItemFromStore(props.itemName);
+    const ratingMap = getRatingMapForItemFromStore(props.tastingItemName);
     ratingMap.forEach((value: TasteRating, key: string) => {
       categoriesRef.value.push(key);
       seriesRef.value[0].data.push(value.rating);
@@ -203,31 +208,40 @@ export default defineComponent({
       transitioning: false,
       sliderValue,
       animationType: Animation.NoAnimation,
+      scoreValueChanged: false,
     };
+  },
+  computed: {
+    currentTastingCategoryName() {
+      return this.categoriesRef[this.currentCategoryIndex]
+    }
   },
   methods: {
     handleScoreInput(score: number) {
+      this.scoreValueChanged = true;
       score = Number(score); //workaround to ensure type safety. not sure why the incoming value is treated as string.
       this.setInputValueRef(score)
       this.setSeriesValueAtIndex(this.currentCategoryIndex, score)
       this.sliderValue = score;
     },
     saveScoreAndProceed(score: number) {
-      const currentCategoryName = this.categoriesRef[this.currentCategoryIndex];
 
-      this.setInputValueRef(score)
-      this.setSeriesValueAtIndex(this.currentCategoryIndex, score)
+      //add rating when not existent for a score of 0
+      if (this.scoreValueChanged || (!tasteRatingExistsFor(this.tastingItemName, this.currentTastingCategoryName)) && score == 0) {
+        this.setInputValueRef(score)
+        this.setSeriesValueAtIndex(this.currentCategoryIndex, score)
 
-      saveItemRatingToStore(this.itemName, currentCategoryName, {
-        category: currentCategoryName,
-        rating: this.getSeriesValueAtIndex(this.currentCategoryIndex),
-        ratedBy: 'user',
-      });
-
+        saveItemRatingToStore(this.tastingItemName, this.currentTastingCategoryName, {
+          category: this.currentTastingCategoryName,
+          rating: this.getSeriesValueAtIndex(this.currentCategoryIndex),
+          ratedBy: 'user',
+        });
+      }
 
       this.goToCategoryIndexAndDetermineAnimation(this.currentCategoryIndex + 1);
       this.setSliderToValue(this.currentCategoryIndex);
     },
+
     goToCategoryIndexAndDetermineAnimation(targetIndex: number) {
       if (targetIndex < 0) {
         this.playTransitionWithAnimation(Animation.SlideLeftNotAllowedShake)
@@ -239,6 +253,7 @@ export default defineComponent({
         this.playTransitionWithAnimation(this.previousCategoryIndex < this.currentCategoryIndex ? Animation.SlideLeft : Animation.SlideRight);
       }
       this.setSliderToValue(this.currentCategoryIndex);
+      this.scoreValueChanged = false;
     },
     playTransitionWithAnimation(animation: Animation, animationTime = 200) {
       this.animationType = animation;
@@ -252,7 +267,8 @@ export default defineComponent({
       this.sliderValue = this.getSeriesValueAtIndex(value)
     },
     submitRating() {
-      submitRatingFromStoreToFirestore().then(() => {
+      console.log("submitting...")
+      submitRatingFromStoreToFirestore(this.tastingItemName).then(() => {
         //TODO loading indicator
         //TODO show success msg to user
         console.log("submitted rating successfully")

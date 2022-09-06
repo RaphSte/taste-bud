@@ -42,6 +42,14 @@
             />
 
             <labeled-button-item
+                class="button-item"
+                label-text="See the evaluation results for your tasting event"
+                button-text="Evaluation results"
+                color-theme="primary"
+                @button-pressed="$router.push({ path: '/session/evaluation/' })"
+            />
+
+            <labeled-button-item
                 class="change-session-button"
                 label-text="Wrong event? Use this to join another one:"
                 button-text="Change Event"
@@ -238,7 +246,7 @@ export default defineComponent({
 <style scoped>
 
 .button-item {
-  padding-top: 12%;
+  padding-top: 8px;
 }
 
 .change-session-button {

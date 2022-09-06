@@ -230,6 +230,7 @@ export default defineComponent({
     saveScoreAndProceed(score: number) {
 
       //add rating when not existent for a score of 0
+      console.log("asdasd", this.scoreValueChanged, (!tasteRatingExistsFor(this.tastingItemName, this.currentTastingCategoryName) ), score, "asdasdasd", this.scoreValueChanged || (!tasteRatingExistsFor(this.tastingItemName, this.currentTastingCategoryName)) && score == 0)
       if (this.scoreValueChanged || (!tasteRatingExistsFor(this.tastingItemName, this.currentTastingCategoryName)) && score == 0) {
         this.setInputValueRef(score)
         this.setSeriesValueAtIndex(this.currentCategoryIndex, score)

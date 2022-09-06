@@ -14,12 +14,9 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/SessionConfig.vue'),
     },
     {
-        path: '/config/tasting-items/',
-        component: () => import('@/views/AddTastingItems.vue'),
-    },
-    {
-        path: '/session/add/tasting-items/',
-        component: () => import('@/views/AddTastingItems.vue'),
+        path: '/success/:tastingSessionCode',
+        component: () => import('@/views/SubmitSuccess.vue'),
+        props: true
     },
     {
         path: '/session/',
@@ -35,8 +32,16 @@ const routes: Array<RouteRecordRaw> = [
         props: true,
     },
     {
-        path: '/success/:tastingSessionCode',
-        component: () => import('@/views/SubmitSuccess.vue'),
+        path: '/session/add/tasting-items/',
+        component: () => import('@/views/AddTastingItems.vue'),
+    },
+    {
+        path: '/session/evaluation/',
+        component: () => import('@/views/EvaluationItemSelection.vue'),
+    },
+    {
+        path: '/session/evaluation/:evaluationItemName/',
+        component: () => import('@/views/EvaluationScreen.vue'),
         props: true
     },
     {

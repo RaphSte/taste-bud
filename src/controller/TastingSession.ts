@@ -93,8 +93,6 @@ export async function writeTasteRatingsToFirestore(ratings: TasteRating[], itemN
 
     //return updateDoc(tastingSessionDoc, {[TASTING_ITEMS_FIELD_NAME + '.' + itemName + '.' + TASTE_RATINGS_FIELD_NAME]: ratingsObject});
 
-    console.log(ratingsObject)
-
     return updateDoc(tastingSessionDoc, {
         [TASTING_ITEMS_FIELD_NAME + '.' + itemName + '.' + TASTE_RATINGS_FIELD_NAME + '.' + userId]: ratingsObject
     });

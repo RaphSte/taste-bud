@@ -59,11 +59,9 @@ export async function writeTastingItemsToFirestore(tastingItems: Map<string, Tas
     const tastingItemMapObject: any = {};
 
     tastingItems.forEach((entry) => {
-        console.log("entry",entry)
         tastingItemMapObject[entry.tastingItemName] = entry;
     });
 
-    console.log("tastingItemMap",tastingItemMapObject)
     return updateDoc(tastingSessionDoc, {tastingItems: tastingItemMapObject })
 }
 

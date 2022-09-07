@@ -133,12 +133,14 @@ export function getTastedItemsFromStore(): Map<string, any> {
 
     const tastedItemsMap = new Map<string, TasteRating>();
     Object.entries(items).forEach((item: any) => {
-        const ratings = item[1].ratings[userStore.userId];
-        if (ratings) {
-            tastedItemsMap.set(item[0], ratings)
+        const key: string = item[0];
+        const value = item[1];
+        const ratings = value.ratings[userStore.userId];
+
+        if (ratings) { //if item has rating add it to tastedItemMap
+            tastedItemsMap.set(key, value)
         }
     })
-    console.log("tastedItemsMap", items)
     return tastedItemsMap;
 }
 
@@ -173,21 +175,20 @@ export function updateTastingItems(tastingItemNames: string[]) {
     const tastingItemMap = getTastedItemsFromStore();
 
     tastingItemNames.forEach((itemName, index) => {
-        if (!tastingItemMap.has(itemName)) {
-            //tastingItemMap.set(itemName, JSON.stringify(Array.from(new Map<string, TastingItem>)))
-            tastingItemMap.set(itemName, {
+        if (!tastingItemMap.has(itemName)) { // if item not tasted
+            tastingItemMap.set(itemName, { //set new item
                 tastingItemName: itemName,
                 index: index,
                 ratings: {},
             });
-        } else {
-            const item: TastingItem = JSON.parse(tastingItemMap.get(itemName));
+        } else { //if item was tasted update only index
+            const item: TastingItem = tastingItemMap.get(itemName);
             item.index = index;
             tastingItemMap.set(itemName, item)
         }
     });
-    const tastingItems: TastingItem[] = convertTastingItemMapToArray(tastingItemMap);
-    writeTastingItemsToFirestore(tastingItems, getSessionKey());
+
+    writeTastingItemsToFirestore(tastingItemMap, getSessionKey());
 }
 
 

@@ -1,16 +1,14 @@
 // Import the functions you need from the SDKs you need
 import {initializeApp} from "firebase/app";
-import {getFirestore, collection, doc, getDoc, addDoc, updateDoc, deleteDoc, setDoc} from 'firebase/firestore/lite';
+import {addDoc, collection, doc, getDoc, getFirestore, updateDoc} from 'firebase/firestore/lite';
 import {
     TasteRating,
     TastingItem,
     TastingSession,
     TastingSessionConfiguration
 } from "@/types/TastingSessionConfiguration";
-import {skipHydrate} from "pinia";
 
 const ROOT_COLLECTION_NAME = 'tasting-sessions';
-const TASTING_ITEM_COLLECTION_NAME = 'tasting-items';
 const TASTING_ITEMS_FIELD_NAME = 'tastingItems';
 const TASTE_RATINGS_FIELD_NAME = 'ratings';
 
@@ -52,55 +50,33 @@ export async function fetchTastingSession(documentId: string): Promise<any> {
         } else {
             reject("No such document!");
         }
-
     })
 }
 
 
-export async function writeTastingItemsToFirestore(tastingItems: TastingItem[], tastingSessionKey: string) {
+export async function writeTastingItemsToFirestore(tastingItems: Map<string, TastingItem>, tastingSessionKey: string) {
     const tastingSessionDoc = doc(db, ROOT_COLLECTION_NAME, tastingSessionKey);
-    const tastingItemMap: any = {};
-    tastingItems.forEach((item: TastingItem) => {
-        tastingItemMap[item.tastingItemName] = item;
+    const tastingItemMapObject: any = {};
+
+    tastingItems.forEach((entry) => {
+        console.log("entry",entry)
+        tastingItemMapObject[entry.tastingItemName] = entry;
     });
-    return updateDoc(tastingSessionDoc, {tastingItems: tastingItemMap})
+
+    console.log("tastingItemMap",tastingItemMapObject)
+    return updateDoc(tastingSessionDoc, {tastingItems: tastingItemMapObject })
 }
-
-// export async function writeTastingItemsToFirestore(tastingItems: TastingItem[], tastingSessionKey: string) {
-//     tastingItems.forEach((item: TastingItem) => {
-//         const tastingItemsCollection = doc(db, ROOT_COLLECTION_NAME, tastingSessionKey, TASTING_ITEM_COLLECTION_NAME, item.tastingItemName);
-//         setDoc(tastingItemsCollection, {'tastingItemName': item.tastingItemName}, {merge: true}).then(() => {
-//             console.log(item.tastingItemName, 'was set to firestore')
-//         });
-//     });
-// }
-
 
 export async function writeTasteRatingsToFirestore(ratings: TasteRating[], itemName: string, tastingSessionKey: string, userId: string) {
     const tastingSessionDoc = doc(db, ROOT_COLLECTION_NAME, tastingSessionKey);
-
-
-    // const ratingsObject: any = {[userId]: {}};
-    // ratings.forEach((rating: TasteRating) => {
-    //     ratingsObject[userId][rating.category] = rating;
-    // });
 
     const ratingsObject: any = {};
     ratings.forEach((rating: TasteRating) => {
         ratingsObject[rating.category] = rating;
     });
 
-
-    //return updateDoc(tastingSessionDoc, {[TASTING_ITEMS_FIELD_NAME + '.' + itemName + '.' + TASTE_RATINGS_FIELD_NAME]: ratingsObject});
-
     return updateDoc(tastingSessionDoc, {
         [TASTING_ITEMS_FIELD_NAME + '.' + itemName + '.' + TASTE_RATINGS_FIELD_NAME + '.' + userId]: ratingsObject
     });
 
-    // ratings.forEach((rating: TasteRating) => {
-    //     const tasteRatingCollection = doc(db, ROOT_COLLECTION_NAME, tastingSessionKey, TASTING_ITEM_COLLECTION_NAME, itemName, RATING_COLLECTION_NAME, rating.category);
-    //     setDoc(tasteRatingCollection, rating, {merge: true}).then(() => {
-    //         console.log('rating for ', rating.category, ' was set to firestore')
-    //     });
-    // });
 }

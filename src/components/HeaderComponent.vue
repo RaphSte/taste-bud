@@ -44,7 +44,6 @@ export default defineComponent({
 <style scoped>
 .top-right-corner-icon {
   font-size: x-large;
-
 }
 
 .top-right-corner-button {

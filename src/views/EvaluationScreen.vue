@@ -2,29 +2,36 @@
   <ion-page>
     <header-component
         :title="'Evaluation: ' + evaluationItemName"
+        :rightEdgeIcon="showSettings ? close: ellipsisVertical"
+        @custom-button-pressed="showSettings = !showSettings"
     />
 
 
-<!--    TODO make fab look nice and expand the toggle options list-->
-    <ion-fab vertical="top" horizontal="end" slot="fixed">
-      <ion-fab-button>
-        <ion-icon :icon="add"></ion-icon>
-      </ion-fab-button>
-      <ion-fab-list side="bottom">
-        <ion-fab-button>
-          <ion-icon :icon="logoFacebook"></ion-icon>
-        </ion-fab-button>
-      </ion-fab-list>
-    </ion-fab>
+    <!--    TODO animation slide settings down-->
+    <div v-if="showSettings">
+      <div class="settings-wrapper">
+        <ion-item>
+          <ion-label>Some more setings...</ion-label>
+          <ion-toggle slot="start"
+                      color="primary"
+                      :checked="showDataLabels"
+                      @ionChange="toggleDataLabelVisibilityAndRerender">
+          </ion-toggle>
+        </ion-item>
+        <ion-item>
+          <ion-label>Show labels</ion-label>
+          <ion-toggle slot="start"
+                      color="primary"
+                      :checked="showDataLabels"
+                      @ionChange="toggleDataLabelVisibilityAndRerender">
+          </ion-toggle>
+          <ion-button color="dark" fill="clear" class="close-menu-button" @click="showSettings = !showSettings">
+            <ion-icon :icon="chevronUp" color="dark" class="close-menu-icon"/>
+          </ion-button>
+        </ion-item>
+      </div>
+    </div>
 
-    <ion-item>
-      <ion-label>Show labels</ion-label>
-      <ion-toggle slot="start"
-                  color="primary"
-                  :checked="showDataLabels"
-                  @ionChange="toggleDataLabelVisibilityAndRerender">
-      </ion-toggle>
-    </ion-item>
 
     <ion-content>
       <swiper class="slide-container" :modules="modules" :pagination="true">
@@ -87,19 +94,9 @@
 
 <script lang="ts">
 import {defineComponent, ref} from "vue";
-import {chevronBack, chevronForward} from 'ionicons/icons';
+import {chevronBack, chevronForward, chevronUp, close, ellipsisVertical, settings} from 'ionicons/icons';
 
-import {
-  IonContent,
-  IonFab,
-  IonFabButton,
-  IonFabList,
-  IonIcon,
-  IonItem,
-  IonLabel,
-  IonPage,
-  IonToggle,
-} from "@ionic/vue";
+import {IonButton, IonContent, IonIcon, IonItem, IonLabel, IonPage, IonToggle} from "@ionic/vue";
 import HeaderComponent from "@/components/HeaderComponent.vue";
 import SpiderDiagram from "@/components/SpiderDiagram.vue";
 import {SpiderDiagramSeriesEntry} from "@/types/DiagramTypes";
@@ -123,7 +120,7 @@ export default defineComponent({
     Swiper,
     SwiperSlide,
     SpiderDiagram,
-    HeaderComponent, IonPage, IonContent, IonLabel, IonToggle, IonItem, IonFab, IonFabButton, IonIcon, IonFabList
+    HeaderComponent, IonPage, IonContent, IonLabel, IonToggle, IonItem, IonButton, IonIcon,
   },
   props: {
     evaluationItemName: {type: String, required: true},
@@ -206,11 +203,14 @@ export default defineComponent({
     }
   },
   data() {
-
-
     return {
       chevronBack,
       chevronForward,
+      chevronUp,
+      settings,
+      ellipsisVertical,
+      close,
+      showSettings: false,
     };
   },
   methods: {
@@ -227,6 +227,22 @@ export default defineComponent({
 
 .slide-container {
   height: 95%;
+}
+
+.close-menu-icon {
+  font-size: x-large;
+  margin: auto;
+}
+
+.close-menu-button {
+  position: absolute;
+  right: 0;
+  padding-right: 9px;
+}
+
+.settings-wrapper {
+  position: absolute;
+  width: 100%;
 }
 
 </style>

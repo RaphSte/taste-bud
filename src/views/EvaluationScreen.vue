@@ -3,38 +3,40 @@
     <header-component
         :title="'Evaluation: ' + evaluationItemName"
         :rightEdgeIcon="showSettings ? close: ellipsisVertical"
-        @custom-button-pressed="showSettings = !showSettings"
+        @custom-button-pressed="toggleShowSettings"
     />
 
+    <div class="settings-wrapper" :style="showSettingsForeground? 'z-index: 1 ': 'z-index: 0' ">
+      <transition name="slide-down">
+        <div v-if="showSettings" class="settings-container">
+          <ion-item>
+            <ion-label>Show y-axis data labels</ion-label>
+            <ion-toggle
+                slot="start"
+                color="primary"
+                :checked="showYAxisDataLabels"
+                @ionChange="toggleYAxisDataLabelVisibilityAndRerender"
+            />
+          </ion-item>
+          <ion-item>
+            <ion-label>Show rating data labels</ion-label>
+            <ion-toggle slot="start"
+                        color="primary"
+                        :checked="showDataLabels"
+                        @ionChange="toggleDataLabelVisibilityAndRerender">
+            </ion-toggle>
+            <ion-button color="dark" fill="clear" class="close-menu-button" @click="toggleShowSettings">
+              <ion-icon :icon="chevronUp" color="dark" class="close-menu-icon"/>
+            </ion-button>
+          </ion-item>
+        </div>
 
-    <!--    TODO animation slide settings down-->
-    <div v-if="showSettings">
-      <div class="settings-wrapper">
-        <ion-item>
-          <ion-label>Some more setings...</ion-label>
-          <ion-toggle slot="start"
-                      color="primary"
-                      :checked="showDataLabels"
-                      @ionChange="toggleDataLabelVisibilityAndRerender">
-          </ion-toggle>
-        </ion-item>
-        <ion-item>
-          <ion-label>Show labels</ion-label>
-          <ion-toggle slot="start"
-                      color="primary"
-                      :checked="showDataLabels"
-                      @ionChange="toggleDataLabelVisibilityAndRerender">
-          </ion-toggle>
-          <ion-button color="dark" fill="clear" class="close-menu-button" @click="showSettings = !showSettings">
-            <ion-icon :icon="chevronUp" color="dark" class="close-menu-icon"/>
-          </ion-button>
-        </ion-item>
-      </div>
+      </transition>
     </div>
 
 
     <ion-content>
-      <swiper class="slide-container" :modules="modules" :pagination="true">
+      <swiper class="slide-container" :modules="modules" :pagination="true" :navigation="true">
 
         <swiper-slide>
           <ion-content>
@@ -44,6 +46,7 @@
                 :categories="categoriesRef"
                 :series-data="userRatingSeries"
                 :show-data-labels="showDataLabels"
+                :show-yaxis-labels="showYAxisDataLabels"
                 :key="spiderDiagramUpdateRef"
             />
           </ion-content>
@@ -56,6 +59,7 @@
                 :categories="categoriesRef"
                 :series-data="combinedRatingSeries"
                 :show-data-labels="showDataLabels"
+                :show-yaxis-labels="showYAxisDataLabels"
                 :key="spiderDiagramUpdateRef"
             />
           </ion-content>
@@ -68,6 +72,7 @@
                 :categories="categoriesRef"
                 :series-data="averageRatingSeries"
                 :show-data-labels="showDataLabels"
+                :show-yaxis-labels="showYAxisDataLabels"
                 :key="spiderDiagramUpdateRef"
             />
           </ion-content>
@@ -80,8 +85,8 @@
                 :categories="categoriesRef"
                 :series-data="medianRatingSeries"
                 :show-data-labels="showDataLabels"
+                :show-yaxis-labels="showYAxisDataLabels"
                 :key="spiderDiagramUpdateRef"
-                class="spider-diagram"
             />
           </ion-content>
         </swiper-slide>
@@ -107,11 +112,8 @@ import 'swiper/css';
 import '@ionic/vue/css/ionic-swiper.css';
 import {Swiper, SwiperSlide} from 'swiper/vue';
 import 'swiper/css/pagination';
-import 'swiper/css/autoplay';
-import 'swiper/css/keyboard';
-import 'swiper/css/scrollbar';
-import 'swiper/css/zoom';
-import {Pagination} from "swiper";
+import 'swiper/css/navigation';
+import {Navigation, Pagination} from "swiper";
 
 
 export default defineComponent({
@@ -131,6 +133,9 @@ export default defineComponent({
 
     const showDataLabels = ref(false);
     const setShowDataLabels = (state: boolean) => showDataLabels.value = state;
+
+    const showYAxisDataLabels = ref(true);
+    const setShowYAxisDataLabels = (state: boolean) => showYAxisDataLabels.value = state;
 
     const consolidatedRatings = getConsolidatedRatings(props.evaluationItemName);
 
@@ -199,7 +204,9 @@ export default defineComponent({
       setSpiderDiagramUpdateRef,
       showDataLabels,
       setShowDataLabels,
-      modules: [Pagination],
+      showYAxisDataLabels,
+      setShowYAxisDataLabels,
+      modules: [Pagination, Navigation],
     }
   },
   data() {
@@ -211,13 +218,29 @@ export default defineComponent({
       ellipsisVertical,
       close,
       showSettings: false,
+      showSettingsForeground: false,
     };
   },
   methods: {
+    toggleShowSettings() {
+      this.showSettings = !this.showSettings;
+      //change z-index style to let leaving animation play out
+      if (this.showSettings) {
+        setTimeout(() => {
+          this.showSettingsForeground = this.showSettings;
+        }, 250)
+      }
+
+    },
     toggleDataLabelVisibilityAndRerender() {
       this.setShowDataLabels(!this.showDataLabels);
       this.setSpiderDiagramUpdateRef(this.spiderDiagramUpdateRef + 1)
+    },
+    toggleYAxisDataLabelVisibilityAndRerender() {
+      this.setShowYAxisDataLabels(!this.showYAxisDataLabels);
+      this.setSpiderDiagramUpdateRef(this.spiderDiagramUpdateRef + 1)
     }
+
 
   },
 });
@@ -240,9 +263,16 @@ export default defineComponent({
   padding-right: 9px;
 }
 
-.settings-wrapper {
-  position: absolute;
+.settings-container {
   width: 100%;
+}
+
+.settings-wrapper {
+  position: sticky;
+  z-index: 1;
+  width: 100%;
+  margin-bottom: -200px;
+  height: 200px;
 }
 
 </style>

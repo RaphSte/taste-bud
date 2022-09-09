@@ -25,6 +25,7 @@ import '@ionic/vue/css/display.css';
 /* Theme variables */
 import './theme/variables.css';
 import './theme/customStyles.css';
+import './theme/customAnimations.css';
 
 import {createPinia} from 'pinia'
 

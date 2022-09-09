@@ -24,6 +24,7 @@ export default defineComponent({
     seriesData: {type: Array<any>},
     showToolbar: {type: Boolean, default: false},
     showDataLabels: {type: Boolean, default: false},
+    showYaxisLabels: {type: Boolean, default: false},
     maxValue: {type: Number, default: 10},
     minValue: {type: Number, default: 0},
   },
@@ -66,7 +67,7 @@ export default defineComponent({
         },
         yaxis: {
           showForNullSeries: true,
-          show: true,
+          show: this.showYaxisLabels,
           min: this.minValue,
           max: this.maxValue,
           labels: {

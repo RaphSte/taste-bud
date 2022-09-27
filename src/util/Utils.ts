@@ -7,7 +7,7 @@ import {
 } from "@/controller/LocalStorage";
 import {TasteRating, TastingItem, TastingSession} from "@/types/TastingSessionConfiguration";
 import {
-    fetchTastingSession,
+    fetchTastingSession, writeScoreToFirestore,
     writeTasteRatingsToFirestore,
     writeTastingItemsToFirestore
 } from "@/controller/TastingSession";
@@ -17,6 +17,8 @@ import {useUserStore} from "@/store/userStore";
 import {storeToRefs} from "pinia";
 import {Ref} from "vue";
 import tastingItemSelection from "@/views/TastingItemSelection.vue";
+import {useScoreStore} from "@/store/scoreStore";
+import {isComponent} from "@vue/test-utils/dist/utils";
 
 
 export async function createUserIdAndSaveToLocalStorage(): Promise<string> {
@@ -228,6 +230,23 @@ export function submitRatingFromStoreToFirestore(tastingItemName: string) {
             reject('no items submitted')
         })
     }
+}
+
+
+export function submitScoreToLocalAndFirestore(tastingItemName: string, score: number) {
+    const userStore = useUserStore();
+    const scoreStore = useScoreStore();
+
+    const userId: string = userStore.userId;
+    const participantsScores: any = scoreStore.participantsScores;
+    participantsScores[userId] = score
+
+    scoreStore.$patch({
+        participantsScores,
+        userScore: score,
+    });
+
+    return writeScoreToFirestore(score, tastingItemName, getSessionKey(), userStore.userId)
 }
 
 

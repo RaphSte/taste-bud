@@ -13,22 +13,34 @@
       />
       <Transition :name="transitionEnabled? animationType: Animation.NoAnimation">
         <div v-if="!transitioning">
-          <ion-item v-if="currentCategoryIndex !== categoriesRef.length" class="ion-padding-bottom">
+          <ion-item class="ion-padding-bottom">
             <ion-text class="ion-text-center">
-              <h1>{{ categoriesRef[currentCategoryIndex] }}-ness</h1>
-              <p>
-                {{
-                  'How ' + this.currentTastingCategoryName + ' is ' + tastingItemName + ' for you? Go ahead and rate it!'
-                }}
-              </p>
+              <div v-if="currentCategoryIndex !== categoriesRef.length">
+                <h1>{{ categoriesRef[currentCategoryIndex] }}-ness</h1>
+                <p>
+                  {{
+                    'How ' + this.currentTastingCategoryName + ' is ' + tastingItemName + ' for you? Go ahead and rate it!'
+                  }}
+                </p>
+              </div>
+              <div v-if="currentCategoryIndex === categoriesRef.length">
+                <h1>Overall liking and wrap up</h1>
+                <p>
+                  How did you like {{ tastingItemName }} over all? Go ahead and rate it!
+                </p>
+                <p>
+                  Finished? Go ahead can submit your rating!
+                </p>
+              </div>
             </ion-text>
           </ion-item>
+
 
           <div class="input-navigation-wrapper">
             <ion-icon class="navigation-icon" color="medium" :icon="chevronBack"
                       @click="goToCategoryIndexAndDetermineAnimation(currentCategoryIndex -1 )"></ion-icon>
 
-            <div v-if="currentCategoryIndex !== categoriesRef.length">
+            <div v-if="currentCategoryIndex !== categoriesRef.length +1">
               <input-component
                   :key="sliderValue"
                   class="rating-input"
@@ -58,15 +70,6 @@
                 />
               </div>
             </div>
-            <ion-item v-if="currentCategoryIndex === categoriesRef.length" class="ion-padding-bottom">
-              <ion-text class="ion-text-center">
-                <h2>Wrap up</h2>
-                <p>
-                  This is your rating for {{ tastingItemName }}. If everything is correct you can go ahead and submit your
-                  rating.
-                </p>
-              </ion-text>
-            </ion-item>
 
 
             <ion-icon
@@ -117,7 +120,7 @@ import {Animation} from "@/types/Animation";
 import {
   getRatingMapForItemFromStore, loadOrCreateUserId,
   saveItemRatingToStore,
-  submitRatingFromStoreToFirestore,
+  submitRatingFromStoreToFirestore, submitScoreToLocalAndFirestore,
   tasteRatingExistsFor
 } from "@/util/Utils";
 import {TasteRating} from "@/types/TastingSessionConfiguration";
@@ -212,6 +215,7 @@ export default defineComponent({
       sliderValue,
       animationType: Animation.NoAnimation,
       scoreValueChanged: false,
+      overAllScore: 0,
     };
   },
   computed: {
@@ -224,13 +228,18 @@ export default defineComponent({
       this.scoreValueChanged = true;
       score = Number(score); //workaround to ensure type safety. not sure why the incoming value is treated as string.
       this.setInputValueRef(score)
-      this.setSeriesValueAtIndex(this.currentCategoryIndex, score)
+
+      if (this.currentCategoryIndex !== this.categoriesRef.length) {
+        this.setSeriesValueAtIndex(this.currentCategoryIndex, score)
+      } else {
+        this.overAllScore = score;
+      }
+
       this.sliderValue = score;
     },
     saveScoreAndProceed(score: number) {
 
       //add rating when not existent for a score of 0
-      console.log("asdasd", this.scoreValueChanged, (!tasteRatingExistsFor(this.tastingItemName, this.currentTastingCategoryName) ), score, "asdasdasd", this.scoreValueChanged || (!tasteRatingExistsFor(this.tastingItemName, this.currentTastingCategoryName)) && score == 0)
       if (this.scoreValueChanged || (!tasteRatingExistsFor(this.tastingItemName, this.currentTastingCategoryName)) && score == 0) {
         this.setInputValueRef(score)
         this.setSeriesValueAtIndex(this.currentCategoryIndex, score)
@@ -241,9 +250,14 @@ export default defineComponent({
           ratedBy: this.userId,
         });
       }
-
       this.goToCategoryIndexAndDetermineAnimation(this.currentCategoryIndex + 1);
-      this.setSliderToValue(this.currentCategoryIndex);
+      if (this.currentCategoryIndex === this.categoriesRef.length) {
+        this.sliderValue = this.overAllScore;
+      } else {
+        this.setSliderToValue(this.currentCategoryIndex);
+      }
+
+
     },
 
     goToCategoryIndexAndDetermineAnimation(targetIndex: number) {
@@ -273,10 +287,13 @@ export default defineComponent({
     submitRating() {
       console.log("submitting...")
       submitRatingFromStoreToFirestore(this.tastingItemName).then(() => {
-        //TODO loading indicator
-        //TODO show success msg to user
-        console.log("submitted rating successfully")
-        this.$router.go(-1);
+        submitScoreToLocalAndFirestore(this.tastingItemName, this.overAllScore).then(() => {
+          console.log("submitting...", this.tastingItemName, this.overAllScore)
+          //TODO loading indicator
+          //TODO show success msg to user
+          console.log("submitted rating successfully")
+          this.$router.go(-1);
+        })
       }).catch((e) => {
         //TODO error handling
         console.log("error while submitting rating: ", e)

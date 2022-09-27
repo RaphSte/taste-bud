@@ -11,6 +11,7 @@ import {
 const ROOT_COLLECTION_NAME = 'tasting-sessions';
 const TASTING_ITEMS_FIELD_NAME = 'tastingItems';
 const TASTE_RATINGS_FIELD_NAME = 'ratings';
+const TASTING_SCORES_FIELD_NAME = 'score';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -62,7 +63,7 @@ export async function writeTastingItemsToFirestore(tastingItems: Map<string, Tas
         tastingItemMapObject[entry.tastingItemName] = entry;
     });
 
-    return updateDoc(tastingSessionDoc, {tastingItems: tastingItemMapObject })
+    return updateDoc(tastingSessionDoc, {tastingItems: tastingItemMapObject})
 }
 
 export async function writeTasteRatingsToFirestore(ratings: TasteRating[], itemName: string, tastingSessionKey: string, userId: string) {
@@ -77,4 +78,12 @@ export async function writeTasteRatingsToFirestore(ratings: TasteRating[], itemN
         [TASTING_ITEMS_FIELD_NAME + '.' + itemName + '.' + TASTE_RATINGS_FIELD_NAME + '.' + userId]: ratingsObject
     });
 
+}
+
+
+export async function writeScoreToFirestore(score: number, itemName: string, tastingSessionKey: string, userId: string) {
+    const tastingSessionDoc = doc(db, ROOT_COLLECTION_NAME, tastingSessionKey);
+    return updateDoc(tastingSessionDoc, {
+        [TASTING_ITEMS_FIELD_NAME + '.' + itemName + '.' + TASTING_SCORES_FIELD_NAME + '.' + userId]: score
+    });
 }

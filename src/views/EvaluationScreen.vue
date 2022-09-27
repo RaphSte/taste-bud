@@ -221,6 +221,11 @@ export default defineComponent({
       showSettingsForeground: false,
     };
   },
+  created() {
+    setTimeout(() => { //hack to force diagram to rerender after page load.
+      this.setSpiderDiagramUpdateRef(this.spiderDiagramUpdateRef + 1);
+    }, 100);
+  },
   methods: {
     toggleShowSettings() {
       this.showSettings = !this.showSettings;

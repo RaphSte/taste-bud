@@ -199,6 +199,8 @@ export default defineComponent({
         setSessionKeyToStore(sessionCode);
         //TODO refactor?
         this.setTastingItemNamesRef(extractTastingItemNamesFromObject(sessionObject));
+        this.eventName = sessionObject.config.sessionName;
+        this.creatorName = sessionObject.config.creatorName;
       }).catch((err) => {
         console.log("failed to load document: ", err)
         this.displayToast(err);

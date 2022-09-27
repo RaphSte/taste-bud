@@ -53,9 +53,12 @@ const router = createRouter({
 router.afterEach((to, from) => {
     const toDepth = to.path.substring(1).split('/').length
     const fromDepth = from.path.substring(1).split('/').length
-    //to.meta.transitionName = toDepth < fromDepth ? 'slide-right' : 'slide-left'
+
+    if(fromDepth < 3 || toDepth < 3 ){
+        to.meta.transitionName = 'no-animation'
+    }
+    to.meta.transitionName = toDepth <= fromDepth ? 'slide-right' : 'slide-left'
     //TODO
-    to.meta.transitionName = 'no-animation'
 })
 
 export default router

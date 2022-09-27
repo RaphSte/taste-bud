@@ -10,7 +10,7 @@
         </ion-text>
       </ion-item>
       <div v-for="(item, index) in tastingItems" :key="index">
-        <ion-item @click="$router.push({ path: `/session/evaluation/${item}` })">
+        <ion-item @click="$router.push({ path: `/session/evaluation/${item}/` })">
           <ion-icon v-if="!tastedItems.get(item)" :icon="checkmarkSharp"/>
           <ion-icon v-if="tastedItems.get(item)" color="success" :icon="checkmarkDoneSharp"/>
           <ion-label class="ion-text-center">

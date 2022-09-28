@@ -8,7 +8,6 @@
         :series="seriesData"
     ></apexchart>
   </div>
-
 </template>
 
 <script lang="ts">
@@ -23,8 +22,8 @@ export default defineComponent({
     categories: {type: Array<string>},
     seriesData: {type: Array<any>},
     showToolbar: {type: Boolean, default: false},
-    showDataLabels: {type: Boolean, default: false},
     showYaxisLabels: {type: Boolean, default: false},
+    flipAxis: {type: Boolean, default: false},
     maxValue: {type: Number, default: 10},
     minValue: {type: Number, default: 0},
   },
@@ -48,7 +47,7 @@ export default defineComponent({
         plotOptions: {
           bar: {
             borderRadius: 10,
-            horizontal: true,
+            horizontal: this.flipAxis,
             dataLabels: {
               position: 'top',
             },
@@ -71,6 +70,13 @@ export default defineComponent({
           tooltip: {
             enabled: false,
           }
+        },
+        yaxis: {
+          showForNullSeries: true,
+          show: this.showYaxisLabels,
+          labels: {
+            show: true,
+          },
         },
         title: {
           text: this.title,

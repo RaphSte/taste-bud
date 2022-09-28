@@ -14,16 +14,25 @@
             <ion-toggle
                 slot="start"
                 color="primary"
-                :checked="showYAxisDataLabels"
+                :checked="showYaxisLabels"
                 @ionChange="toggleYAxisDataLabelVisibilityAndRerender"
             />
           </ion-item>
+<!--          TODO implement-->
+<!--          <ion-item>-->
+<!--            <ion-label>Include Non-Rated Items</ion-label>-->
+<!--            <ion-toggle slot="start"-->
+<!--                        color="primary"-->
+<!--                        :checked="includeNonRatedItems"-->
+<!--                        @ionChange="includeNonRatedItemsAndRerender">-->
+<!--            </ion-toggle>-->
+<!--          </ion-item>-->
           <ion-item>
-            <ion-label>Show rating data labels</ion-label>
+            <ion-label>Swtich Diagram Type</ion-label>
             <ion-toggle slot="start"
                         color="primary"
-                        :checked="showDataLabels"
-                        @ionChange="toggleDataLabelVisibilityAndRerender">
+                        :checked="switchDiagramType"
+                        @ionChange="toggleDiagramTypeAndRerender">
             </ion-toggle>
             <ion-button color="dark" fill="clear" class="close-menu-button" @click="toggleShowSettings">
               <ion-icon :icon="chevronUp" color="dark" class="close-menu-icon"/>
@@ -45,9 +54,11 @@
             :height="500"
             :categories="scoreCategories"
             :series-data="scoreSeriesData"
+            :showYaxisLabels="showYaxisLabels"
+            :flipAxis="switchDiagramType"
         />
       </ion-content>
-<!--     TODO: put everything inside slider and add spider diagrams for all items on the second slide-->
+      <!--     TODO: put everything inside slider and add spider diagrams for all items on the second slide-->
       <!--      <swiper class="slide-container" :modules="modules" :pagination="true" :navigation="true">-->
       <!--        <swiper-slide>-->
       <!--          <ion-content>-->
@@ -80,7 +91,7 @@
 </template>
 
 <script lang="ts">
-import {defineComponent} from "vue";
+import {defineComponent, ref} from "vue";
 import {chevronBack, chevronForward, chevronUp, close, ellipsisVertical, settings} from 'ionicons/icons';
 
 import {IonButton, IonContent, IonIcon, IonItem, IonLabel, IonPage, IonToggle} from "@ionic/vue";
@@ -167,6 +178,9 @@ export default defineComponent({
       showSettings: false,
       showSettingsForeground: false,
       diagramUpdate: 0,
+      showYaxisLabels: true,
+      switchDiagramType: false,
+      includeNonRatedItems: false,
     };
   },
   created() {
@@ -183,6 +197,18 @@ export default defineComponent({
           this.showSettingsForeground = this.showSettings;
         }, 250)
       }
+    },
+    toggleYAxisDataLabelVisibilityAndRerender() {
+      this.showYaxisLabels = !this.showYaxisLabels;
+      this.diagramUpdate = this.diagramUpdate + 1;
+    },
+    toggleDiagramTypeAndRerender() {
+      this.switchDiagramType = !this.switchDiagramType;
+      this.diagramUpdate = this.diagramUpdate + 1;
+    },
+    includeNonRatedItemsAndRerender() {
+      this.includeNonRatedItems = !this.includeNonRatedItems;
+      //TODO
     },
   },
 });

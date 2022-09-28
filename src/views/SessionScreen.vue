@@ -98,7 +98,7 @@ import {TastingSession} from "@/types/TastingSessionConfiguration";
 import {Animation} from "@/types/Animation";
 import {
   extractTastingItemNamesFromObject,
-  fetchTastingSessionAndSaveToLocalStorage,
+  fetchTastingSessionAndSaveToLocalStorage, populateScoreStoreFromSession,
   setSessionKeyToStore
 } from "@/util/Utils";
 import TitledInputComponent from "@/components/TitledInputComponent.vue";
@@ -153,6 +153,7 @@ export default defineComponent({
         setEventNameRef(sessionObject.config.sessionName);
         let tastingItems = extractTastingItemNamesFromObject(sessionObject);
         setTastingItemNamesRef(tastingItems);
+        populateScoreStoreFromSession(sessionObject);
       }).catch((err) => {
         console.log("failed to load document in setup!: ", err, sessionKey)
         //TODO error handling
@@ -197,6 +198,7 @@ export default defineComponent({
         this.setNeedsActiveSession(false);
         setSessionKeyToPreferences(sessionCode)
         setSessionKeyToStore(sessionCode);
+        populateScoreStoreFromSession(sessionObject);
         //TODO refactor?
         this.setTastingItemNamesRef(extractTastingItemNamesFromObject(sessionObject));
         this.eventName = sessionObject.config.sessionName;

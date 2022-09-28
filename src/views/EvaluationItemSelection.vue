@@ -9,10 +9,17 @@
           <p>Choose the item of which you'd like to view the evaluation</p>
         </ion-text>
       </ion-item>
+
+      <ion-item @click="$router.push({ path: `/session/evaluation/all-items/` })">
+        <ion-icon :icon="podium" color="tertiary"/>
+        <ion-label class="ion-text-center">All Items</ion-label>
+        <ion-icon color="primary" :icon="chevronForward"/>
+      </ion-item>
+
       <div v-for="(item, index) in tastingItems" :key="index">
         <ion-item @click="$router.push({ path: `/session/evaluation/${item}/` })">
           <ion-icon v-if="!tastedItems.get(item)" :icon="checkmarkSharp"/>
-          <ion-icon v-if="tastedItems.get(item)" color="success" :icon="checkmarkDoneSharp"/>
+          <ion-icon v-if="tastedItems.get(item)" color="success" :icon="checkmarkDone"/>
           <ion-label class="ion-text-center">
             {{ item }}
           </ion-label>
@@ -30,7 +37,7 @@ import {IonContent, IonIcon, IonItem, IonLabel, IonPage, IonText,} from "@ionic/
 import {useTastingSessionStore} from "@/store/tastingSessionStore";
 import {extractTastingItemNamesFromObject, getTastedItemsFromStore} from "@/util/Utils";
 import {TastingSession} from "@/types/TastingSessionConfiguration";
-import {checkmarkDoneSharp, checkmarkSharp, chevronForward,} from 'ionicons/icons';
+import {checkmarkDone, checkmarkSharp, chevronForward, podium} from 'ionicons/icons';
 
 export default defineComponent({
   name: 'EvaluationItemSelection',
@@ -49,7 +56,8 @@ export default defineComponent({
     return {
       chevronForward,
       checkmarkSharp,
-      checkmarkDoneSharp,
+      checkmarkDone,
+      podium,
     }
   }
 })

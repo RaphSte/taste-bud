@@ -14,6 +14,7 @@ export type TastingItem = {
     tastingItemName: string,
     index: number,
     ratings: TasteRating[],
+    score?: any
 }
 
 export type TasteRating = {

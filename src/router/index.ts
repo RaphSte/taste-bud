@@ -43,6 +43,11 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/EvaluationScreen.vue'),
         props: true
     },
+    {
+        path: '/session/evaluation/all-items/',
+        component: () => import('@/views/CombinedEvaluationItems.vue'),
+        props: true
+    },
 ]
 
 const router = createRouter({

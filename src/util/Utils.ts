@@ -146,9 +146,54 @@ export function getTastedItemsFromStore(): Map<string, any> {
     return tastedItemsMap;
 }
 
+
+export function populateScoreStoreFromSession(sessionObject: TastingSession) {
+    const scoreStore = useScoreStore();
+
+    //TODO set userScore in scoreStore as well
+    Object.entries(sessionObject.tastingItems).forEach((entry) => {
+        const key = entry[0];
+        const value = entry[1];
+
+        const scoreStoreObject: any = scoreStore.participantsScores
+        scoreStoreObject[key] = value.score
+        scoreStore.$patch({
+            participantsScores: scoreStoreObject
+        });
+        console.log(JSON.stringify(scoreStoreObject))
+    })
+}
+
+
+export function getTastingScoresFor(item: string): number[] {
+    const scoreStore = useScoreStore();
+    const scores = scoreStore.participantsScores;
+    const tastingScores: number[] = [];
+
+    if (scores) {
+        Object.entries(scores).forEach((entry) => {
+            const key = entry[0];
+            const value: any = entry[1];
+            const valueEntries = Object.entries(value)
+
+            tastingScores.push(valueEntries[0][1] as number)
+        })
+    }
+    return tastingScores;
+}
+
 export function getTastingItemsFromStore(): TastingItem[] {
     const tastingSessionStore = useTastingSessionStore();
-    return tastingSessionStore.tastingSession.tastingItems
+
+    const tastingItemObjects = tastingSessionStore.tastingSession.tastingItems
+    const tastingItems: TastingItem[] = []
+
+    Object.entries(tastingItemObjects).forEach((entry) => {
+        const value: TastingItem = entry[1];
+        tastingItems.push(value)
+    })
+
+    return tastingItems
 }
 
 /**
@@ -239,11 +284,18 @@ export function submitScoreToLocalAndFirestore(tastingItemName: string, score: n
 
     const userId: string = userStore.userId;
     const participantsScores: any = scoreStore.participantsScores;
-    participantsScores[userId] = score
+
+    if (!participantsScores[tastingItemName]) {
+        participantsScores[tastingItemName] = {}
+    }
+    participantsScores[tastingItemName][userId] = score
+
+    const userScore: any = scoreStore.userScore;
+    userScore[tastingItemName] = score;
 
     scoreStore.$patch({
         participantsScores,
-        userScore: score,
+        userScore,
     });
 
     return writeScoreToFirestore(score, tastingItemName, getSessionKey(), userStore.userId)

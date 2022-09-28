@@ -288,7 +288,6 @@ export default defineComponent({
       console.log("submitting...")
       submitRatingFromStoreToFirestore(this.tastingItemName).then(() => {
         submitScoreToLocalAndFirestore(this.tastingItemName, this.overAllScore).then(() => {
-          console.log("submitting...", this.tastingItemName, this.overAllScore)
           //TODO loading indicator
           //TODO show success msg to user
           console.log("submitted rating successfully")

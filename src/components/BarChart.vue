@@ -32,18 +32,25 @@ export default defineComponent({
     apexchart: VueApexCharts,
   },
   data(props) {
-
+    //TODO replace with capacitor logic?
+    const darkThemeMq = window.matchMedia("(prefers-color-scheme: dark)");
+    const theme = darkThemeMq.matches ? 'dark' : 'light'
     return {
       chartOptions: {
+        theme: {
+          mode: theme,
+        },
         chart: {
-          height: 350,
+          height: this.height,
           type: 'bar',
+          background: 'transparent',
         },
         plotOptions: {
           bar: {
             borderRadius: 10,
+            horizontal: true,
             dataLabels: {
-              position: 'top', // top, center, bottom
+              position: 'top',
             },
           }
         },
@@ -52,27 +59,17 @@ export default defineComponent({
           offsetY: -20,
           style: {
             fontSize: '12px',
-            colors: ["#304758"]
-          }
+            colors: ["#a8a8a8"]
+          },
         },
-
+        tooltip: {
+          fillSeriesColor: true,
+        },
         xaxis: {
           categories: this.categories,
-          position: 'top',
-          crosshairs: {
-            fill: {
-              type: 'gradient',
-              gradient: {
-                colorFrom: '#D8E3F0',
-                colorTo: '#BED1E6',
-                stops: [0, 100],
-                opacityFrom: 0.4,
-                opacityTo: 0.5,
-              }
-            }
-          },
+          position: 'bottom',
           tooltip: {
-            enabled: true,
+            enabled: false,
           }
         },
         title: {
@@ -80,10 +77,14 @@ export default defineComponent({
           floating: true,
           offsetY: -5,
           align: 'center',
-          style: {
-            color: '#444'
+        },
+        legend: {
+          show: true,
+          markers: {
+            width: 18,
+            height: 18,
           }
-        }
+        },
       }
     }
 

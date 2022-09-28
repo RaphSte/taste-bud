@@ -20,7 +20,7 @@
           <div class="ion-text-center">
             <ion-label>{{ eventName }}</ion-label>
             <ion-text>
-              <p>You are currently participating in >{{ creatorName }}`s&lt; event, by the name
+              <p>You are currently participating in {{ creatorName }}`s event, by the name
                 of '{{ eventName }}'.</p>
             </ion-text>
 

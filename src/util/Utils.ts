@@ -38,7 +38,7 @@ export function loadOrCreateUserId(): Ref<string> {
         });
     }
     const {userId} = storeToRefs(userStore);
-    return userId
+    return userId;
 }
 
 
@@ -77,14 +77,10 @@ export function extractTastingItemNamesFromObject(session: TastingSession): stri
 export function saveItemRatingToStore(itemName: string, categoryName: string, rating: TasteRating) {
     const tastedItemStore = useTastedItemsStore();
 
-
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const items: TasteRating[] = tastedItemStore.items.get(itemName) ? tastedItemStore.items.get(itemName) : [] as TasteRating[];
-
-
     items.push(rating)
-
     tastedItemStore.$patch({
         items: tastedItemStore.items.set(itemName, items)
     })
@@ -167,17 +163,22 @@ export function populateScoreStoreFromSession(sessionObject: TastingSession) {
 
 export function getTastingScoresFor(item: string): number[] {
     const scoreStore = useScoreStore();
-    const scores = scoreStore.participantsScores;
+    const scores: any = scoreStore.participantsScores;
     const tastingScores: number[] = [];
 
     if (scores) {
-        Object.entries(scores).forEach((entry) => {
-            const key = entry[0];
-            const value: any = entry[1];
-            const valueEntries = Object.entries(value)
-
-            tastingScores.push(valueEntries[0][1] as number)
-        })
+        const itemScores: any = scores[item];
+        if (itemScores) {
+            Object.entries(itemScores).forEach((entry) => {
+                const key = entry[0];
+                const value: any = entry[1];
+                const valueEntries = Object.entries(value)
+                tastingScores.push(value)
+                if (key === item) {
+                    tastingScores.push(valueEntries[0][1] as number)
+                }
+            })
+        }
     }
     return tastingScores;
 }
@@ -265,8 +266,6 @@ export function submitRatingFromStoreToFirestore(tastingItemName: string) {
         })
         tastingSession.tastingItems[tastingItemName].ratings[userStore.userId] = ratingsObject;
         tastingSessionStore.$patch({tastingSession: tastingSession})
-        console.log("ratingsObject", ratingsObject)
-        console.log("tastingSession", tastingSessionStore.tastingSession)
 
 
         return writeTasteRatingsToFirestore(tasteRatingArray, tastingItemName, getSessionKey(), userStore.userId);
@@ -334,8 +333,6 @@ export function getConsolidatedRatings(itemName: string) {
 
     categories.forEach((categoryName) => {
         consolidatedRatings[categoryName] = [];
-
-
         Object.entries(ratings).forEach((item) => {
             const categories: any = item[1];
             const category = categories[categoryName]
@@ -355,7 +352,8 @@ export function calculateMedian(numbers: number[]): number {
     const middle = Math.floor(sorted.length / 2);
 
     if (sorted.length % 2 === 0) {
-        return (sorted[middle - 1] + sorted[middle]) / 2;
+        const median = (sorted[middle - 1] + sorted[middle]) / 2;
+        return median ? median : 0;
     }
     return sorted[middle];
 }

@@ -1,5 +1,4 @@
 <template>
-
   <div id="chart">
     <apexchart
         :height="height + 'px'"
@@ -32,14 +31,19 @@ export default defineComponent({
     apexchart: VueApexCharts,
   },
   data(props) {
-
-    const yAxisLabelColors = Array.from({length: this.maxValue - this.minValue + 1}, () => '#a8a8a8');
+    //TODO replace with capacitor logic?
+    const darkThemeMq = window.matchMedia("(prefers-color-scheme: dark)");
+    const theme = darkThemeMq.matches ? 'dark' : 'light'
 
     return {
       chartOptions: {
+        theme: {
+          mode: theme,
+        },
         chart: {
           height: this.height,
           type: 'radar',
+          background: 'transparent',
           dropShadow: {
             enabled: true,
             blur: 1,
@@ -77,7 +81,7 @@ export default defineComponent({
               fontSize: '14px',
               fontFamily: 'Helvetica, Arial, sans-serif',
               fontWeight: 'bold',
-              colors: yAxisLabelColors,
+
             },
           },
         },
@@ -91,7 +95,24 @@ export default defineComponent({
             return Math.round((value + Number.EPSILON) * 100) / 100
           },
         },
+        legend: {
+          show: true,
+          markers: {
+            width: 16,
+            height: 16,
+          }
+        },
       },
+      noData: {
+        text: 'no data',
+        align: 'center',
+        verticalAlign: 'middle',
+        offsetX: 0,
+        offsetY: 0,
+        style: {
+          fontSize: '14px',
+        }
+      }
     }
 
   },
@@ -99,5 +120,10 @@ export default defineComponent({
 </script>
 
 <style scoped>
+
+
+#chart {
+  background: transparent;
+}
 
 </style>

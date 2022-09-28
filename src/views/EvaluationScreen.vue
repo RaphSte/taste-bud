@@ -104,7 +104,7 @@ import {chevronBack, chevronForward, chevronUp, close, ellipsisVertical, setting
 import {IonButton, IonContent, IonIcon, IonItem, IonLabel, IonPage, IonToggle} from "@ionic/vue";
 import HeaderComponent from "@/components/HeaderComponent.vue";
 import SpiderDiagram from "@/components/SpiderDiagram.vue";
-import {SpiderDiagramSeriesEntry} from "@/types/DiagramTypes";
+import {DiagramSeriesEntry} from "@/types/DiagramTypes";
 import {calculateAverage, calculateMedian, getConsolidatedRatings, getRatingMapForItemFromStore} from "@/util/Utils";
 import {TasteRating} from "@/types/TastingSessionConfiguration";
 
@@ -139,17 +139,17 @@ export default defineComponent({
 
     const consolidatedRatings = getConsolidatedRatings(props.evaluationItemName);
 
-    const userRatingDataObject: SpiderDiagramSeriesEntry = {
+    const userRatingDataObject: DiagramSeriesEntry = {
       name: "User Rating",
       data: [],
     }
 
-    const averageRatingDataObject: SpiderDiagramSeriesEntry = {
+    const averageRatingDataObject: DiagramSeriesEntry = {
       name: "Average",
       data: [],
     };
 
-    const medianRatingDataObject: SpiderDiagramSeriesEntry = {
+    const medianRatingDataObject: DiagramSeriesEntry = {
       name: "Median",
       data: [],
     }

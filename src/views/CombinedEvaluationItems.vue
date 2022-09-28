@@ -1,7 +1,7 @@
 <template>
   <ion-page>
     <header-component
-        :title="'Evaluation: ' + evaluationItemName"
+        :title="'Item Comparison'"
         :rightEdgeIcon="showSettings ? close: ellipsisVertical"
         @custom-button-pressed="toggleShowSettings"
     />
@@ -37,37 +37,44 @@
 
     <ion-content>
 
-
-      <swiper class="slide-container" :modules="modules" :pagination="true" :navigation="true">
-        <swiper-slide>
-          <ion-content>
-            <h1>Scores</h1>
-            <bar-chart
-                :key="diagramUpdate"
-                title="Preview"
-                :height="250"
-                :categories="scoreCategories"
-                :series-data="scoreSeriesData"
-            />
-
-          </ion-content>
-        </swiper-slide>
-        <swiper-slide>
-          <ion-content>
-            <h1>Median</h1>
-            <spider-diagram
-                :key="diagramUpdate"
-                :height="400"
-                :categories="categoriesRef"
-                :series-data="medianRatingSeries"
-                :show-data-labels="showDataLabels"
-                :show-yaxis-labels="showYAxisDataLabels"
-            />
-          </ion-content>
-        </swiper-slide>
-      </swiper>
-
-
+      <ion-content>
+        <h1 class="ion-text-center">Scores</h1>
+        <bar-chart
+            :key="diagramUpdate"
+            title="Consolidated scores"
+            :height="500"
+            :categories="scoreCategories"
+            :series-data="scoreSeriesData"
+        />
+      </ion-content>
+<!--     TODO: put everything inside slider and add spider diagrams for all items on the second slide-->
+      <!--      <swiper class="slide-container" :modules="modules" :pagination="true" :navigation="true">-->
+      <!--        <swiper-slide>-->
+      <!--          <ion-content>-->
+      <!--            <h1>Scores</h1>-->
+      <!--            <bar-chart-->
+      <!--                :key="diagramUpdate"-->
+      <!--                title="Consolidated scores"-->
+      <!--                :height="500"-->
+      <!--                :categories="scoreCategories"-->
+      <!--                :series-data="scoreSeriesData"-->
+      <!--            />-->
+      <!--          </ion-content>-->
+      <!--        </swiper-slide>-->
+      <!--        <swiper-slide>-->
+      <!--          <ion-content>-->
+      <!--            <h1>Median</h1>-->
+      <!--            &lt;!&ndash;            <spider-diagram&ndash;&gt;-->
+      <!--            &lt;!&ndash;                :key="diagramUpdate"&ndash;&gt;-->
+      <!--            &lt;!&ndash;                :height="400"&ndash;&gt;-->
+      <!--            &lt;!&ndash;                :categories="categoriesRef"&ndash;&gt;-->
+      <!--            &lt;!&ndash;                :series-data="medianRatingSeries"&ndash;&gt;-->
+      <!--            &lt;!&ndash;                :show-data-labels="showDataLabels"&ndash;&gt;-->
+      <!--            &lt;!&ndash;                :show-yaxis-labels="showYAxisDataLabels"&ndash;&gt;-->
+      <!--            &lt;!&ndash;            />&ndash;&gt;-->
+      <!--          </ion-content>-->
+      <!--        </swiper-slide>-->
+      <!--      </swiper>-->
     </ion-content>
   </ion-page>
 </template>
@@ -87,39 +94,61 @@ import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 import {Navigation, Pagination} from "swiper";
 import BarChart from "@/components/BarChart.vue";
-import {getTastingItemsFromStore, getTastingScoresFor} from "@/util/Utils";
+import {calculateAverage, calculateMedian, getTastingItemsFromStore, getTastingScoresFor} from "@/util/Utils";
+import {DiagramSeriesEntry} from "@/types/DiagramTypes";
 
 
 export default defineComponent({
   name: "CombinedEvaluationItems",
   components: {
     BarChart,
+    // eslint-disable-next-line vue/no-unused-components
     Swiper,
+    // eslint-disable-next-line vue/no-unused-components
     SwiperSlide,
+    // eslint-disable-next-line vue/no-unused-components
     SpiderDiagram,
     HeaderComponent, IonPage, IonContent, IonLabel, IonToggle, IonItem, IonButton, IonIcon,
   },
   props: {},
   setup() {
-
-
     const data: number[] = []
+    const averageRatings: number[] = [];
+    const medianRatings: number[] = [];
+
     const scoreSeriesData = [{
-      name: 'Scores',
+      name: 'Raw Score',
       data: data
     }]
-    const scoreCategories: string[] = [];
 
+    const averageRatingDataObject: DiagramSeriesEntry = {
+      name: "Average",
+      data: [],
+    };
+
+    const medianRatingDataObject: DiagramSeriesEntry = {
+      name: "Median",
+      data: [],
+    }
+
+
+    const scoreCategories: string[] = [];
 
     const tastingItems = getTastingItemsFromStore();
 
     tastingItems.forEach(item => {
       const tastingScores: number[] = getTastingScoresFor(item.tastingItemName);
       const sum: number = tastingScores.reduce((pv: number, cv: number) => pv + cv, 0);
-
+      averageRatings.push(calculateAverage(tastingScores))
+      medianRatings.push(calculateMedian(tastingScores))
       scoreSeriesData[0].data.push(sum)
       scoreCategories.push(item.tastingItemName)
     })
+
+    averageRatingDataObject.data = averageRatings
+    medianRatingDataObject.data = medianRatings
+    scoreSeriesData.push(averageRatingDataObject)
+    scoreSeriesData.push(medianRatingDataObject)
 
     return {
       scoreCategories,
@@ -154,13 +183,9 @@ export default defineComponent({
           this.showSettingsForeground = this.showSettings;
         }, 250)
       }
-    }
-    ,
-
-  }
-  ,
-})
-;
+    },
+  },
+});
 </script>
 
 <style scoped>

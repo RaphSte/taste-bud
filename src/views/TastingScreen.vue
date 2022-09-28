@@ -113,7 +113,7 @@ import {getTastingSessionFromPreferences} from "@/controller/LocalStorage";
 import {IonButton, IonContent, IonFooter, IonIcon, IonItem, IonPage, IonText,} from "@ionic/vue";
 import HeaderComponent from "@/components/HeaderComponent.vue";
 import SpiderDiagram from "@/components/SpiderDiagram.vue";
-import {SpiderDiagramSeriesEntry} from "@/types/DiagramTypes";
+import {DiagramSeriesEntry} from "@/types/DiagramTypes";
 import InputComponent from "@/components/InputComponent.vue";
 import slider from "vue3-slider"
 import {Animation} from "@/types/Animation";
@@ -149,7 +149,7 @@ export default defineComponent({
       name: 'Series 1',
       data: dataArray,
     }]);
-    const setSeriesRef = (state: SpiderDiagramSeriesEntry[]) => seriesRef.value = state;
+    const setSeriesRef = (state: DiagramSeriesEntry[]) => seriesRef.value = state;
     const setSeriesValueAtIndex = (index: number, value: number) => seriesRef.value[0].data[index] = value;
     const getSeriesValueAtIndex = (index: number): number => seriesRef.value[0].data[index]
 

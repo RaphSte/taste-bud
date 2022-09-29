@@ -46,6 +46,7 @@ export async function fetchTastingSessionAndSaveToLocalStorage(sessionCode: stri
     return fetchTastingSession(sessionCode).then(sessionObject => {
         setTastingSessionToPreferences(sessionObject).then(r => console.log("tasting session was set to storage"));
         const tastingSessionStore = useTastingSessionStore();
+        tastingSessionStore.$reset();
         tastingSessionStore.$patch({
             tastingSession: sessionObject,
             sessionKey: sessionCode,
@@ -84,8 +85,6 @@ export function saveItemRatingToStore(itemName: string, categoryName: string, ra
     tastedItemStore.$patch({
         items: tastedItemStore.items.set(itemName, items)
     })
-    // const tastedItemsStore = useTastedItemsStore();
-    // tastedItemsStore.$patch({items: JSON.stringify(Array.from(tastedItems.entries()))});
 }
 
 export function getRatingMapForItemFromStore(itemName: string): Map<string, TasteRating> {
@@ -134,7 +133,6 @@ export function getTastedItemsFromStore(): Map<string, any> {
         const key: string = item[0];
         const value = item[1];
         const ratings = value.ratings[userStore.userId];
-
         if (ratings) { //if item has rating add it to tastedItemMap
             tastedItemsMap.set(key, value)
         }
@@ -156,7 +154,6 @@ export function populateScoreStoreFromSession(sessionObject: TastingSession) {
         scoreStore.$patch({
             participantsScores: scoreStoreObject
         });
-        console.log(JSON.stringify(scoreStoreObject))
     })
 }
 
@@ -220,6 +217,7 @@ export function setSessionKeyToStore(sessionKey: string) {
  * */
 export function updateTastingItems(tastingItemNames: string[]) {
 
+    //TODO this is not optimal, deleting items wont work properly once an item was rated.
     const tastingItemMap = getTastedItemsFromStore();
 
     tastingItemNames.forEach((itemName, index) => {
@@ -312,13 +310,6 @@ function convertTastingItemMapToArray(tastingItemMap: Map<string, TastingItem>):
     });
     return arr;
 }
-
-
-// function extractRatingsFromValue(value: any): TasteRating[] {
-//     console.log("arr", value);
-//     const arr = JSON.parse(value);
-//     return arr.map((value: any) => value[1]);
-// }
 
 
 export function getConsolidatedRatings(itemName: string) {

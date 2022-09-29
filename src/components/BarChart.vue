@@ -60,6 +60,9 @@ export default defineComponent({
             fontSize: '12px',
             colors: ["#a8a8a8"]
           },
+          formatter: (value: any) => {
+            return Math.round((value + Number.EPSILON) * 100) / 100
+          },
         },
         tooltip: {
           fillSeriesColor: true,
@@ -76,6 +79,9 @@ export default defineComponent({
           show: this.showYaxisLabels,
           labels: {
             show: true,
+            formatter: (value: any) => {
+              return Math.round((value + Number.EPSILON) * 100) / 100
+            },
           },
         },
         title: {

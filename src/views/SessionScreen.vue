@@ -83,7 +83,12 @@
       </ion-button>
     </ion-footer>
   </ion-page>
-
+  <ion-loading
+      :is-open="processingSessionCode"
+      cssClass="my-custom-class"
+      message="Loading session data..."
+      :duration="3000"
+  />
 </template>
 
 <script lang="ts">
@@ -92,7 +97,7 @@ import {createOutline} from 'ionicons/icons';
 import {Clipboard} from '@capacitor/clipboard';
 import {getSessionKeyFromPreferences, setSessionKeyToPreferences} from "@/controller/LocalStorage";
 
-import {IonButton, IonContent, IonFooter, IonLabel, IonPage, IonText, IonToast} from "@ionic/vue";
+import {IonButton, IonContent, IonFooter, IonLabel, IonPage, IonText, IonToast, IonLoading } from "@ionic/vue";
 import HeaderComponent from "@/components/HeaderComponent.vue";
 import {TastingSession} from "@/types/TastingSessionConfiguration";
 import {Animation} from "@/types/Animation";
@@ -119,6 +124,7 @@ export default defineComponent({
     IonFooter,
     IonLabel,
     IonText,
+    IonLoading,
   },
   setup() {
     const toastIsOpenRef = ref(false);
@@ -145,8 +151,14 @@ export default defineComponent({
     const tastingItemNames = ref(tastingItems);
     const setTastingItemNamesRef = (state: string[]) => tastingItemNames.value = state;
 
+    const processingSessionCode = ref(false);
+    const setProcessingSessionCode = (state: boolean) => processingSessionCode.value = state;
+
+
 
     const processSessionCode = (sessionKey: string) => {
+      //TODO loading indicator
+      setProcessingSessionCode(true)
       fetchTastingSessionAndSaveToLocalStorage(sessionKey).then((sessionObject: TastingSession) => {
         setTastingSessionRef(sessionObject);
         setCreatorNameRef(sessionObject.config.creatorName);
@@ -154,9 +166,11 @@ export default defineComponent({
         let tastingItems = extractTastingItemNamesFromObject(sessionObject);
         setTastingItemNamesRef(tastingItems);
         populateScoreStoreFromSession(sessionObject);
+        setProcessingSessionCode(false)
       }).catch((err) => {
         console.log("failed to load document in setup!: ", err, sessionKey)
         //TODO error handling
+        setProcessingSessionCode(false)
       })
     }
 
@@ -183,6 +197,8 @@ export default defineComponent({
       setSessionKeyRef,
       creatorName,
       eventName,
+      processingSessionCode,
+      setProcessingSessionCode,
     }
   },
   data() {
@@ -194,6 +210,7 @@ export default defineComponent({
   methods: {
     processSessionCode(sessionCode: string) {
       fetchTastingSessionAndSaveToLocalStorage(sessionCode).then((sessionObject) => {
+        this.setProcessingSessionCode(true);
         this.displayToast();
         this.setNeedsActiveSession(false);
         setSessionKeyToPreferences(sessionCode)
@@ -203,9 +220,11 @@ export default defineComponent({
         this.setTastingItemNamesRef(extractTastingItemNamesFromObject(sessionObject));
         this.eventName = sessionObject.config.sessionName;
         this.creatorName = sessionObject.config.creatorName;
+        this.setProcessingSessionCode(false);
       }).catch((err) => {
         console.log("failed to load document: ", err)
         this.displayToast(err);
+        this.setProcessingSessionCode(false);
       })
     },
     joinNewSession(sessionCode: string) {

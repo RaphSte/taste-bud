@@ -7,7 +7,7 @@
     <ion-content>
       <labeled-button-item
           class="button-item"
-          :label-text="creatorName + ' invited you to participate in his tasting event: ' + eventName + '. Use the button to join!'"
+          :label-text="creatorName + ' invited you to participate in his tasting event: ' + eventName + '. Press the button to join!'"
           button-text="Join!"
           color-theme="primary"
           @button-pressed="processSessionCode(sessionId)"
@@ -63,7 +63,7 @@ export default defineComponent({
     const loadingSessionData = ref(true);
     const setLoadingSessionData = (state: boolean) => loadingSessionData.value = state;
 
-
+    //TODO rework to avoid double session joining
     fetchTastingSession(props.sessionId).then(sessionObject => {
       setCreatorName(sessionObject.config.creatorName);
       setEventName(sessionObject.config.sessionName);

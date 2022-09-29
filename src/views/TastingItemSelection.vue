@@ -38,7 +38,7 @@ export default defineComponent({
   props: {},
   setup() {
     const tastingSessionStore = useTastingSessionStore();
-
+    tastingSessionStore.$dispose()
     const tastingSession: TastingSession = tastingSessionStore.tastingSession
     const tastingItems: string[] = extractTastingItemNamesFromObject(tastingSession);
     const tastedItems: Map<string, any> = getTastedItemsFromStore();

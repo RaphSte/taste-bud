@@ -26,6 +26,11 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/TastingItemSelection.vue'),
     },
     {
+        path: '/session/join/:sessionId',
+        component: () => import('@/views/JoinShortcut.vue'),
+        props: true,
+    },
+    {
         path: '/session/tasting-items/:tastingItemName/',
         component: () => import('@/views/TastingScreen.vue'),
         props: true,

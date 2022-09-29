@@ -47,7 +47,7 @@
                   placeHolder="Your Score"
                   :input-value="String(sliderValue) "
                   :clear-input="false"
-                  :icon="send"
+                  :icon="''"
                   icon-color="primary"
                   inputMode="numeric"
                   :debounceTime="700"

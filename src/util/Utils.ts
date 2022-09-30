@@ -7,7 +7,8 @@ import {
 } from "@/controller/LocalStorage";
 import {TasteRating, TastingItem, TastingSession} from "@/types/TastingSessionConfiguration";
 import {
-    fetchTastingSession, writeScoreToFirestore,
+    fetchTastingSession,
+    writeScoreToFirestore,
     writeTasteRatingsToFirestore,
     writeTastingItemsToFirestore
 } from "@/controller/TastingSession";
@@ -16,9 +17,8 @@ import {useTastedItemsStore} from "@/store/tastedItemsStore";
 import {useUserStore} from "@/store/userStore";
 import {storeToRefs} from "pinia";
 import {Ref} from "vue";
-import tastingItemSelection from "@/views/TastingItemSelection.vue";
 import {useScoreStore} from "@/store/scoreStore";
-import {isComponent} from "@vue/test-utils/dist/utils";
+import {Action, UpdateActionItem} from "@/types/UpdateActions";
 
 
 export async function createUserIdAndSaveToLocalStorage(): Promise<string> {
@@ -215,25 +215,50 @@ export function setSessionKeyToStore(sessionKey: string) {
 /**
  * adds new tasting items to the store and firebase
  * */
-export function updateTastingItems(tastingItemNames: string[]) {
+export function updateTastingItems(tastingItemUpdates: UpdateActionItem[]) {
 
-    //TODO this is not optimal, deleting items wont work properly once an item was rated.
-    const tastingItemMap = getTastedItemsFromStore();
+    const tastingItems = getTastingItemsFromStore();
+    const tastingItemMap: Map<string, TastingItem> = new Map(tastingItems.map(tastingItem => [tastingItem.tastingItemName, tastingItem]));
 
-    tastingItemNames.forEach((itemName, index) => {
-        if (!tastingItemMap.has(itemName)) { // if item not tasted
-            tastingItemMap.set(itemName, { //set new item
-                tastingItemName: itemName,
-                index: index,
-                ratings: {},
-            });
-        } else { //if item was tasted update only index
-            const item: TastingItem = tastingItemMap.get(itemName);
-            item.index = index;
-            tastingItemMap.set(itemName, item)
+    tastingItemUpdates.forEach((item: UpdateActionItem) => {
+        switch (item.action) {
+            case Action.Create:
+                tastingItemMap.set(item.itemName, {
+                    tastingItemName: item.itemName,
+                    index: item.index,
+                    ratings: [],
+                });
+                break;
+            case Action.Rename: { //renaming is essentially creating a new entry and deleting the old one
+                const itemToUpdate = tastingItemMap.get(item.itemName);
+                if (itemToUpdate && itemToUpdate.tastingItemName && item.newName) {
+                    itemToUpdate.tastingItemName = item.newName;
+                    tastingItemMap.delete(item.itemName);
+                    tastingItemMap.set(item.newName, itemToUpdate);
+                } else {
+                    console.warn("something went wrong while renaming for ", item.itemName)
+                }
+                break;
+            }
+            case Action.UpdateIndex: {
+                const itemToUpdate = tastingItemMap.get(item.itemName);
+                if (itemToUpdate && itemToUpdate.tastingItemName && item.newIndex != null) {
+                    itemToUpdate.index = item.newIndex;
+                    tastingItemMap.set(item.itemName, itemToUpdate);
+                } else {
+                    console.warn("something went wrong while updating index for ", item.itemName)
+                }
+                break;
+            }
+            case Action.Delete:
+                tastingItemMap.delete(item.itemName);
+                break;
+            default:
+                console.warn("something went wrong while performing item update for ", item.itemName)
+                break;
         }
-    });
-
+    })
+    //TODO return promise from firestore write to add loading indicator
     writeTastingItemsToFirestore(tastingItemMap, getSessionKey());
 }
 

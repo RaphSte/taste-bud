@@ -52,9 +52,10 @@ import {Clipboard} from '@capacitor/clipboard';
 import {IonButton, IonContent, IonFooter, IonPage, IonText, IonToast} from "@ionic/vue";
 import HeaderComponent from "@/components/HeaderComponent.vue";
 import InputItemListHandler from "@/components/InputItemListHandler.vue";
-import {TastingSession} from "@/types/TastingSessionConfiguration";
+import {TastingItem, TastingSession} from "@/types/TastingSessionConfiguration";
 import {extractTastingItemNamesFromObject, updateTastingItems} from "@/util/Utils";
 import {useTastingSessionStore} from "@/store/tastingSessionStore";
+import {Action, UpdateActionItem} from "@/types/UpdateActions";
 
 export default defineComponent({
   name: "AddTastingItems",
@@ -62,6 +63,11 @@ export default defineComponent({
   setup() {
     const toastIsOpenRef = ref(false);
     const toastSetOpen = (state: boolean) => toastIsOpenRef.value = state;
+
+
+    const actions: UpdateActionItem[] = []
+    const updateActions = ref(actions);
+    const addUpdateAction = (item: UpdateActionItem) => updateActions.value.push(item);
 
 
     const tastingSessionStore = useTastingSessionStore();
@@ -80,6 +86,8 @@ export default defineComponent({
       toastMessage: "something went wrong...",
       tastingItemNames,
       setTastingItemNamesRef,
+      updateActions,
+      addUpdateAction,
     }
   },
   data() {
@@ -92,21 +100,73 @@ export default defineComponent({
   methods: {
     handleTastingItemAdded(item: string) {
       this.tastingItemNames.push(item)
+      //this.tastingItemNames.indexOf(item) //perheaps tastingitemNames.length would be better
+      const index = this.tastingItemNames.length
+      this.addUpdateAction({
+        itemName: item,
+        action: Action.Create,
+        index: index,
+        newIndex: index,
+      });
     },
     handleTastingItemRename(item: string, index: number) {
+      const oldName = this.tastingItemNames[index] ? this.tastingItemNames[index] : '\'empty-string\'' //deal with empty strings;
       this.tastingItemNames[index] = item
+      const newName = item ? item : '\'empty-string\'' //deal with empty strings
+      this.addUpdateAction({
+        itemName: oldName,
+        newName: newName,
+        action: Action.Rename,
+        index: index,
+      });
     },
     handleTastingItemRemoved(index: number) {
+      const name = this.tastingItemNames[index]
       this.tastingItemNames.splice(index, 1);
+      this.addUpdateAction({
+        itemName: name,
+        action: Action.Delete,
+        index: index,
+      });
     },
     handleTastingItemReorder(indexFrom: number, indexTo: number) {
+      this.queUpdateActions(indexFrom, indexTo, indexTo);
+
       let movedElement = this.tastingItemNames[indexFrom];
       this.tastingItemNames.splice(indexFrom, 1);
       this.tastingItemNames.splice(indexTo, 0, movedElement);
       this.inputItemListHandlerUpdate++;
+
+      this.addUpdateAction({
+        itemName: movedElement,
+        action: Action.UpdateIndex,
+        index: indexFrom,
+        newIndex: indexTo,
+      });
+
+
     },
+    queUpdateActions(initialStartIndex: number, initialTargetIndex: number, indexToShift: number) {
+      if (initialStartIndex == initialTargetIndex) { //failsave
+        return;
+      }
+      const shiftingRight = initialStartIndex > initialTargetIndex;
+      const shiftModifier = shiftingRight ? 1 : -1;
+
+      let elementToShift = this.tastingItemNames[indexToShift];
+      if (elementToShift && indexToShift !== initialStartIndex) {
+        this.addUpdateAction({
+          itemName: elementToShift,
+          action: Action.UpdateIndex,
+          index: indexToShift,
+          newIndex: indexToShift + shiftModifier,
+        });
+        this.queUpdateActions(initialStartIndex, initialTargetIndex, indexToShift + shiftModifier)
+      }
+    },
+
     submitTastingItems() {
-      updateTastingItems(this.tastingItemNames);
+      updateTastingItems(this.updateActions);
       this.$router.go(-1)
     },
   },

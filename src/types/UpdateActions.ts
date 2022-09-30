@@ -12,5 +12,3 @@ export type UpdateActionItem = {
     index: number,
     newIndex?: number,
 }
-
-

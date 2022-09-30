@@ -130,6 +130,7 @@ export default defineComponent({
       });
     },
     handleTastingItemReorder(indexFrom: number, indexTo: number) {
+      //perform index shifts before array is changed//perform index shifts before array is changed
       this.queUpdateActions(indexFrom, indexTo, indexTo);
 
       let movedElement = this.tastingItemNames[indexFrom];
@@ -137,7 +138,7 @@ export default defineComponent({
       this.tastingItemNames.splice(indexTo, 0, movedElement);
       this.inputItemListHandlerUpdate++;
 
-      this.addUpdateAction({
+      this.addUpdateAction({ //enque update action after shifts
         itemName: movedElement,
         action: Action.UpdateIndex,
         index: indexFrom,
@@ -151,9 +152,10 @@ export default defineComponent({
         return;
       }
       const shiftingRight = initialStartIndex > initialTargetIndex;
-      const shiftModifier = shiftingRight ? 1 : -1;
+      const shiftModifier = shiftingRight ? 1 : -1; //determine if shift to the right or left
 
       let elementToShift = this.tastingItemNames[indexToShift];
+      //recursion condition: as long as starting index not reached, keep shifting indexes
       if (elementToShift && indexToShift !== initialStartIndex) {
         this.addUpdateAction({
           itemName: elementToShift,

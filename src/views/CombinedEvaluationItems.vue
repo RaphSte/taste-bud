@@ -18,15 +18,15 @@
                 @ionChange="toggleYAxisDataLabelVisibilityAndRerender"
             />
           </ion-item>
-<!--          TODO implement-->
-<!--          <ion-item>-->
-<!--            <ion-label>Include Non-Rated Items</ion-label>-->
-<!--            <ion-toggle slot="start"-->
-<!--                        color="primary"-->
-<!--                        :checked="includeNonRatedItems"-->
-<!--                        @ionChange="includeNonRatedItemsAndRerender">-->
-<!--            </ion-toggle>-->
-<!--          </ion-item>-->
+          <!--          TODO implement-->
+          <!--          <ion-item>-->
+          <!--            <ion-label>Include Non-Rated Items</ion-label>-->
+          <!--            <ion-toggle slot="start"-->
+          <!--                        color="primary"-->
+          <!--                        :checked="includeNonRatedItems"-->
+          <!--                        @ionChange="includeNonRatedItemsAndRerender">-->
+          <!--            </ion-toggle>-->
+          <!--          </ion-item>-->
           <ion-item>
             <ion-label>Swtich Diagram Type</ion-label>
             <ion-toggle slot="start"
@@ -143,7 +143,7 @@ export default defineComponent({
     }
 
 
-    const scoreCategories: string[] = [];
+    let scoreCategories: string[] = [];
 
     const tastingItems = getTastingItemsFromStore();
 
@@ -156,15 +156,37 @@ export default defineComponent({
       scoreCategories.push(item.tastingItemName)
     })
 
-    averageRatingDataObject.data = averageRatings
-    medianRatingDataObject.data = medianRatings
+
+    const refSort = ((targetData: any[], refData: any[]) => {
+      // Create an array of indices [0, 1, 2, ...N].
+      let indices = Object.keys(refData);
+
+      // Sort array of indices according to the reference data.
+      indices.sort((indexA: any, indexB: any) => {
+        if (refData[indexA] > refData[indexB]) {
+          return -1;
+        } else if (refData[indexA] < refData[indexB]) {
+          return 1;
+        }
+        return 0;
+      });
+      // Map array of indices to corresponding values of the target array.
+      return indices.map((index: any) => targetData[index]);
+    });
+
+    const refArray = averageRatings;
+    averageRatingDataObject.data = refSort(averageRatings, refArray)
+    medianRatingDataObject.data = refSort(medianRatings, refArray);
+    scoreSeriesData[0].data = refSort(scoreSeriesData[0].data, refArray);
     scoreSeriesData.push(averageRatingDataObject)
     scoreSeriesData.push(medianRatingDataObject)
 
+    scoreCategories = refSort(scoreCategories, refArray);
     return {
       scoreCategories,
       scoreSeriesData,
       modules: [Pagination, Navigation],
+      refSort,
     }
   },
   data() {

@@ -9,7 +9,7 @@
             v-if="needsActiveSessionRef"
             :key="inputComponentUpdate"
             label-text="Enter Your Code Here"
-            place-holder="or press the button to copy it "
+            place-holder="or press the button to paste it "
             description-text="You need to join a tasting event in order to participate. You can do it by entering your session-invite code into the field below"
             :input-value="sessionKey"
             :icon="createOutline"
@@ -85,7 +85,6 @@
   </ion-page>
   <ion-loading
       :is-open="processingSessionCode"
-      cssClass="my-custom-class"
       message="Loading session data..."
       :duration="3000"
   />

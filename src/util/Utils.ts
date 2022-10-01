@@ -78,9 +78,8 @@ export function extractTastingItemNamesFromObject(session: TastingSession): stri
 export function saveItemRatingToStore(itemName: string, categoryName: string, rating: TasteRating) {
     const tastedItemStore = useTastedItemsStore();
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    const items: TasteRating[] = tastedItemStore.items.get(itemName) ? tastedItemStore.items.get(itemName) : [] as TasteRating[];
+    const storedItem = tastedItemStore.items.get(itemName);
+    const items: TasteRating[] = storedItem ? storedItem : [] as TasteRating[];
     items.push(rating)
     tastedItemStore.$patch({
         items: tastedItemStore.items.set(itemName, items)
@@ -97,8 +96,6 @@ export function getRatingMapForItemFromStore(itemName: string): Map<string, Tast
     const itemRatingsMap = new Map<string, TasteRating>();
 
     categories.forEach((category: string) => {
-
-
         if (itemRatings && itemRatings[category]) {
             itemRatingsMap.set(category, itemRatings[category]);
         } else {
@@ -216,7 +213,6 @@ export function setSessionKeyToStore(sessionKey: string) {
  * adds new tasting items to the store and firebase
  * */
 export function updateTastingItems(tastingItemUpdates: UpdateActionItem[]) {
-
     const tastingItems = getTastingItemsFromStore();
     const tastingItemMap: Map<string, TastingItem> = new Map(tastingItems.map(tastingItem => [tastingItem.tastingItemName, tastingItem]));
 
@@ -258,8 +254,7 @@ export function updateTastingItems(tastingItemUpdates: UpdateActionItem[]) {
                 break;
         }
     })
-    //TODO return promise from firestore write to add loading indicator
-    writeTastingItemsToFirestore(tastingItemMap, getSessionKey());
+    return writeTastingItemsToFirestore(tastingItemMap, getSessionKey());
 }
 
 
@@ -272,15 +267,12 @@ export function submitRatingFromStoreToFirestore(tastingItemName: string) {
     if (tasteRatings) {
         const tasteRatingArray: TasteRating[] = tasteRatings;
         const userStore = useUserStore();
-
-
-        //update session store
-        const tastingSessionStore = useTastingSessionStore();
+        const tastingSessionStore = useTastingSessionStore(); //update session store
 
         const tastingSession: any = tastingSessionStore.tastingSession;
 
         const ratingsObject: any = {}
-        tasteRatings.forEach((rating) => {
+        tasteRatings.forEach((rating: TasteRating) => {
             ratingsObject[rating.category] = {
                 category: rating.category,
                 rating: rating.rating,
@@ -323,28 +315,11 @@ export function submitScoreToLocalAndFirestore(tastingItemName: string, score: n
     return writeScoreToFirestore(score, tastingItemName, getSessionKey(), userStore.userId)
 }
 
-
-function convertTastingItemMapToArray(tastingItemMap: Map<string, TastingItem>): TastingItem[] {
-    const arr = Array.from(tastingItemMap, ([name, value]) => ({
-        tastingItemName: name,
-        index: 0,
-        ratings: value.ratings,
-    }));
-    arr.forEach((item, index) => {
-        item.index = index;
-    });
-    return arr;
-}
-
-
 export function getConsolidatedRatings(itemName: string) {
-
     const consolidatedRatings: any = {};
-
     const tastingSessionStore = useTastingSessionStore();
     const items: any = tastingSessionStore.tastingSession.tastingItems
     const ratings = items[itemName].ratings
-
     const categories = tastingSessionStore.tastingSession.config.categories;
 
     categories.forEach((categoryName) => {
@@ -376,6 +351,5 @@ export function calculateMedian(numbers: number[]): number {
 
 export function calculateAverage(numbers: number[]): number {
     const sum = numbers.reduce((a, b) => a + b, 0);
-    const avg = (sum / numbers.length) || 0;
-    return avg;
+    return (sum / numbers.length) || 0;
 }

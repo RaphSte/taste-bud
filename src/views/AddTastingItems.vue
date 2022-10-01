@@ -30,6 +30,11 @@
           @didDismiss="toastSetOpen(false)"
           :color="toastColor"
       >
+        <ion-loading
+            :is-open="submittingUpdates"
+            message="submitting updated Items..."
+            :duration="3000"
+        />
       </ion-toast>
     </ion-content>
     <ion-footer collapse="fade">
@@ -49,7 +54,7 @@ import {defineComponent, ref} from "vue";
 import {createOutline} from 'ionicons/icons';
 import {Clipboard} from '@capacitor/clipboard';
 
-import {IonButton, IonContent, IonFooter, IonPage, IonText, IonToast} from "@ionic/vue";
+import {IonButton, IonContent, IonFooter, IonLoading, IonPage, IonText, IonToast} from "@ionic/vue";
 import HeaderComponent from "@/components/HeaderComponent.vue";
 import InputItemListHandler from "@/components/InputItemListHandler.vue";
 import {TastingItem, TastingSession} from "@/types/TastingSessionConfiguration";
@@ -59,11 +64,20 @@ import {Action, UpdateActionItem} from "@/types/UpdateActions";
 
 export default defineComponent({
   name: "AddTastingItems",
-  components: {InputItemListHandler, HeaderComponent, IonPage, IonButton, IonToast, IonContent, IonFooter, IonText},
+  components: {
+    InputItemListHandler,
+    HeaderComponent,
+    IonPage,
+    IonButton,
+    IonToast,
+    IonContent,
+    IonFooter,
+    IonText,
+    IonLoading
+  },
   setup() {
     const toastIsOpenRef = ref(false);
     const toastSetOpen = (state: boolean) => toastIsOpenRef.value = state;
-
 
     const actions: UpdateActionItem[] = []
     const updateActions = ref(actions);
@@ -76,6 +90,8 @@ export default defineComponent({
     const tastingItemNames = ref(tastingItems);
     const setTastingItemNamesRef = (state: string[]) => tastingItemNames.value = state;
 
+    const submittingUpdates = ref(false);
+    const setSubmittingUpdates = (state: boolean) => submittingUpdates.value = state;
 
     return {
       createOutline,
@@ -88,6 +104,8 @@ export default defineComponent({
       setTastingItemNamesRef,
       updateActions,
       addUpdateAction,
+      submittingUpdates,
+      setSubmittingUpdates,
     }
   },
   data() {
@@ -100,7 +118,6 @@ export default defineComponent({
   methods: {
     handleTastingItemAdded(item: string) {
       this.tastingItemNames.push(item)
-      //this.tastingItemNames.indexOf(item) //perheaps tastingitemNames.length would be better
       const index = this.tastingItemNames.length
       this.addUpdateAction({
         itemName: item,
@@ -138,7 +155,7 @@ export default defineComponent({
       this.tastingItemNames.splice(indexTo, 0, movedElement);
       this.inputItemListHandlerUpdate++;
 
-      this.addUpdateAction({ //enque update action after shifts
+      this.addUpdateAction({ //enqueue update action after shifts
         itemName: movedElement,
         action: Action.UpdateIndex,
         index: indexFrom,
@@ -148,7 +165,7 @@ export default defineComponent({
 
     },
     queUpdateActions(initialStartIndex: number, initialTargetIndex: number, indexToShift: number) {
-      if (initialStartIndex == initialTargetIndex) { //failsave
+      if (initialStartIndex == initialTargetIndex) { //failsafe
         return;
       }
       const shiftingRight = initialStartIndex > initialTargetIndex;
@@ -168,8 +185,14 @@ export default defineComponent({
     },
 
     submitTastingItems() {
-      updateTastingItems(this.updateActions);
-      this.$router.go(-1)
+      this.setSubmittingUpdates(true);
+      updateTastingItems(this.updateActions).then(() => {
+        this.setSubmittingUpdates(false);
+        this.$router.go(-1);
+      }).catch(reason => {
+        this.toastSetOpen(true)
+        console.error('error while submitting: ', reason);
+      });
     },
   },
 });

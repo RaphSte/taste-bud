@@ -29,13 +29,12 @@
           :duration="2500"
           @didDismiss="toastSetOpen(false)"
           :color="toastColor"
-      >
-        <ion-loading
-            :is-open="submittingUpdates"
-            message="submitting updated Items..."
-            :duration="3000"
-        />
-      </ion-toast>
+      />
+      <ion-loading
+          :is-open="submittingUpdates"
+          message="submitting updated Items..."
+          :duration="3000"
+      />
     </ion-content>
     <ion-footer collapse="fade">
       <ion-button

@@ -337,6 +337,17 @@ export function getConsolidatedRatings(itemName: string) {
     return consolidatedRatings;
 }
 
+export function getUserScoreFromStoreForItem(item: string): number {
+    const scoreStore = useScoreStore();
+    const userStore = useUserStore();
+
+    const userId: string = userStore.userId;
+    const participantsScores: any = scoreStore.participantsScores;
+
+    const userScore: number | undefined = participantsScores[item][userId]
+    return userScore ? userScore : 0;
+}
+
 
 export function calculateMedian(numbers: number[]): number {
     const sorted = Array.from(numbers).sort((a, b) => a - b);

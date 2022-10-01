@@ -80,6 +80,22 @@
 
         </div>
       </Transition>
+
+
+      <ion-toast
+          :is-open="toastIsOpenRef"
+          :message="toastMessage"
+          :duration="2500"
+          @didDismiss="toastSetOpen(false)"
+          :color="toastColor"
+      />
+      <ion-loading
+          :is-open="submittingRatings"
+          message="submitting ratings..."
+          :duration="3000"
+      />
+
+
     </ion-content>
     <ion-footer
         collapse="fade"
@@ -110,7 +126,7 @@ import {chevronBack, chevronForward, send} from 'ionicons/icons';
 
 import {getTastingSessionFromPreferences} from "@/controller/LocalStorage";
 
-import {IonButton, IonContent, IonFooter, IonIcon, IonItem, IonPage, IonText,} from "@ionic/vue";
+import {IonButton, IonContent, IonFooter, IonIcon, IonItem, IonLoading, IonPage, IonText, IonToast,} from "@ionic/vue";
 import HeaderComponent from "@/components/HeaderComponent.vue";
 import SpiderDiagram from "@/components/SpiderDiagram.vue";
 import {DiagramSeriesEntry} from "@/types/DiagramTypes";
@@ -118,7 +134,7 @@ import InputComponent from "@/components/InputComponent.vue";
 import slider from "vue3-slider"
 import {Animation} from "@/types/Animation";
 import {
-  getRatingMapForItemFromStore, loadOrCreateUserId,
+  getRatingMapForItemFromStore, getUserScoreFromStoreForItem, loadOrCreateUserId,
   saveItemRatingToStore,
   submitRatingFromStoreToFirestore, submitScoreToLocalAndFirestore,
   tasteRatingExistsFor
@@ -130,7 +146,7 @@ export default defineComponent({
   components: {
     InputComponent,
     SpiderDiagram,
-    HeaderComponent, IonPage, IonButton, IonContent, IonFooter, IonItem, IonText, IonIcon,
+    HeaderComponent, IonPage, IonButton, IonContent, IonFooter, IonItem, IonText, IonIcon, IonToast, IonLoading,
     "vue3-slider": slider,
   },
   props: {
@@ -143,6 +159,11 @@ export default defineComponent({
     const inputValueRef = ref(0);
     const setInputValueRef = (state: number) => inputValueRef.value = state;
 
+    const toastIsOpenRef = ref(false);
+    const toastSetOpen = (state: boolean) => toastIsOpenRef.value = state;
+
+    const submittingRatings = ref(false);
+    const setSubmittingRatings = (state: boolean) => submittingRatings.value = state;
 
     const dataArray: number[] = [];
     const seriesRef = ref([{
@@ -192,9 +213,13 @@ export default defineComponent({
       setInputValueRef,
       ratingMap,
       userId,
+      toastIsOpenRef,
+      toastSetOpen,
+      submittingRatings,
+      setSubmittingRatings,
     }
   },
-  data() {
+  data(props) {
 
     let sliderValue = 0;
 
@@ -202,6 +227,8 @@ export default defineComponent({
     if (this.ratingMap instanceof Map && this.ratingMap.size > 0) { //non-necessary check, but typescript won't compie without it for some reason
       sliderValue = this.ratingMap.entries().next().value[1].rating;
     }
+
+    const overAllScore = getUserScoreFromStoreForItem(props.tastingItemName);
 
     return {
       send,
@@ -215,7 +242,9 @@ export default defineComponent({
       sliderValue,
       animationType: Animation.NoAnimation,
       scoreValueChanged: false,
-      overAllScore: 0,
+      overAllScore,
+      toastMessage: 'Success',
+      toastColor: 'success',
     };
   },
   computed: {
@@ -256,8 +285,6 @@ export default defineComponent({
       } else {
         this.setSliderToValue(this.currentCategoryIndex);
       }
-
-
     },
 
     goToCategoryIndexAndDetermineAnimation(targetIndex: number) {
@@ -285,17 +312,17 @@ export default defineComponent({
       this.sliderValue = this.getSeriesValueAtIndex(value)
     },
     submitRating() {
-      console.log("submitting...")
+      this.setSubmittingRatings(true);
       submitRatingFromStoreToFirestore(this.tastingItemName).then(() => {
         submitScoreToLocalAndFirestore(this.tastingItemName, this.overAllScore).then(() => {
-          //TODO loading indicator
-          //TODO show success msg to user
-          console.log("submitted rating successfully")
+          this.toastSetOpen(true); //this might not be needed since the duration is too short anyway
           this.$router.go(-1);
         })
       }).catch((e) => {
-        //TODO error handling
-        console.log("error while submitting rating: ", e)
+        this.toastMessage = `something went wrong while submitting: ${e}`
+        this.toastColor = 'warning'
+        this.setSubmittingRatings(false);
+        this.toastSetOpen(true);
       });
     }
   },

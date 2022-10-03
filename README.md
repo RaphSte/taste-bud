@@ -6,9 +6,9 @@ Basically a digital way to hold and participate in beer/whine/etc. tastings
 # TODOs
 
 - loading indicator for committing and fetching firebase stuff:
-    - [ ] submitting session config
-    - [ ] fetching session config when adding taste items
-    - [ ] submitting tasting items
+    - [x] submitting session config
+    - [x] fetching session config when adding taste items
+    - [x] submitting tasting items
     - [ ] changing session
 - translations
 - readme with screenshots
@@ -23,5 +23,5 @@ Basically a digital way to hold and participate in beer/whine/etc. tastings
 
 # Future feature ideas
  - sort tasting items to get personal and over all favourites
- - perhaps extra rating screen 'how did you like this item'
+ - [x] perhaps extra rating screen 'how did you like this item'
  - configurable min and max values (rn it's fixed between 0 and 10)

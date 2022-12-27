@@ -60,8 +60,9 @@ export default defineComponent({
         stroke: {
           width: 2
         },
+        colors: ['#eec292', '#1ba07d', '#19383a'],
         fill: {
-          opacity: 0.2
+          opacity: 0.2,
         },
         markers: {
           size: 0

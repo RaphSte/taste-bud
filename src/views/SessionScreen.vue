@@ -49,13 +49,15 @@
                 @button-pressed="$router.push({ path: '/session/evaluation/' })"
             />
 
-            <labeled-button-item
-                class="change-session-button"
-                label-text="Wrong event? Use this to join another one:"
-                button-text="Change Event"
-                color-theme="secondary"
-                @button-pressed="setNeedsActiveSession(true)"
-            />
+            <div class="bottom-button-container">
+              <labeled-button-item
+                  class="change-session-button"
+                  label-text="Wrong event? Use this to join another one:"
+                  button-text="Change Event"
+                  color-theme="secondary"
+                  @button-pressed="setNeedsActiveSession(true)"
+              />
+            </div>
           </div>
         </div>
       </Transition>
@@ -96,7 +98,7 @@ import {createOutline} from 'ionicons/icons';
 import {Clipboard} from '@capacitor/clipboard';
 import {getSessionKeyFromPreferences, setSessionKeyToPreferences} from "@/controller/LocalStorage";
 
-import {IonButton, IonContent, IonFooter, IonLabel, IonPage, IonText, IonToast, IonLoading } from "@ionic/vue";
+import {IonButton, IonContent, IonFooter, IonLabel, IonPage, IonText, IonToast, IonLoading} from "@ionic/vue";
 import HeaderComponent from "@/components/HeaderComponent.vue";
 import {TastingSession} from "@/types/TastingSessionConfiguration";
 import {Animation} from "@/types/Animation";
@@ -152,7 +154,6 @@ export default defineComponent({
 
     const processingSessionCode = ref(false);
     const setProcessingSessionCode = (state: boolean) => processingSessionCode.value = state;
-
 
 
     const processSessionCode = (sessionKey: string) => {
@@ -272,7 +273,7 @@ export default defineComponent({
 }
 
 .change-session-button {
-  position: fixed;
+  padding-top: 64px;
   bottom: 0;
   width: 100%;
 }

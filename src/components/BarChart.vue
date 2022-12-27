@@ -39,6 +39,7 @@ export default defineComponent({
         theme: {
           mode: theme,
         },
+        colors: ['#eec292', '#1ba07d', '#19383a'],
         chart: {
           height: this.height,
           type: 'bar',

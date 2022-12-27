@@ -37,7 +37,7 @@
 
 
           <div class="input-navigation-wrapper">
-            <ion-icon class="navigation-icon" color="medium" :icon="chevronBack"
+            <ion-icon class="navigation-icon" color="tertiary" :icon="chevronBack"
                       @click="goToCategoryIndexAndDetermineAnimation(currentCategoryIndex -1 )"></ion-icon>
 
             <div v-if="currentCategoryIndex !== categoriesRef.length +1">
@@ -57,7 +57,7 @@
               <div class="slider-style">
                 <vue3-slider
                     v-model="sliderValue"
-                    color="#3880ff"
+                    color="#b2583c"
                     track-color="grey"
                     :step="1"
                     :min="0"
@@ -74,7 +74,7 @@
 
             <ion-icon
                 v-if="currentCategoryIndex !== categoriesRef.length"
-                class="navigation-icon" color="medium" :icon="chevronForward"
+                class="navigation-icon" color="tertiary" :icon="chevronForward"
                 @click="saveScoreAndProceed(inputValueRef)"/>
           </div>
 

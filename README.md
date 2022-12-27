@@ -9,7 +9,7 @@ Basically a digital way to hold and participate in beer/whine/etc. tastings
     - [x] submitting session config
     - [x] fetching session config when adding taste items
     - [x] submitting tasting items
-    - [ ] changing session
+    - [x] changing session
 - translations
 - readme with screenshots
 - [x] figure out a way to avoid people overwriting their submitted tasting items

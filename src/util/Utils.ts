@@ -122,7 +122,11 @@ export function tasteRatingExistsFor(tastingItemName: string, tastingCategoryNam
 export function getTastedItemsFromStore(): Map<string, any> {
     const userStore = useUserStore();
     const tastingSessionStore = useTastingSessionStore();
+
     const session = tastingSessionStore.tastingSession;
+
+    console.log("loading session" + JSON.stringify(session))
+
     const items = JSON.parse(JSON.stringify(session.tastingItems));
 
     const tastedItemsMap = new Map<string, TasteRating>();
@@ -183,7 +187,7 @@ export function getTastingItemsFromStore(): TastingItem[] {
     const tastingItemObjects = tastingSessionStore.tastingSession.tastingItems
     const tastingItems: TastingItem[] = []
 
-    Object.entries(tastingItemObjects).forEach((entry) => {
+    Object.entries(tastingItemObjects).forEach((entry: any) => {
         const value: TastingItem = entry[1];
         tastingItems.push(value)
     })
@@ -279,7 +283,13 @@ export function submitRatingFromStoreToFirestore(tastingItemName: string) {
                 ratedBy: rating.ratedBy,
             };
         })
-        tastingSession.tastingItems[tastingItemName].ratings[userStore.userId] = ratingsObject;
+        // I hate myself for doing this. at least I got it to work with this dirty hack
+        let ratings = tastingSession.tastingItems[tastingItemName].ratings //returns []
+        if (ratings.length == 0){
+            ratings = {}
+        }
+        ratings[userStore.userId] = ratingsObject;
+        tastingSession.tastingItems[tastingItemName].ratings = ratings
         tastingSessionStore.$patch({tastingSession: tastingSession})
 
 
@@ -344,7 +354,7 @@ export function getUserScoreFromStoreForItem(item: string): number {
     const userId: string = userStore.userId;
     const participantsScores: any = scoreStore.participantsScores;
 
-    const userScore: number | undefined = participantsScores[item][userId]
+    const userScore: number | undefined = participantsScores[item]?.[userId];
     return userScore ? userScore : 0;
 }
 

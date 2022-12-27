@@ -247,6 +247,11 @@ export default defineComponent({
       toastColor: 'success',
     };
   },
+  created() {
+    setTimeout(() => { //hack to force diagram to rerender after page load.
+      this.setSpiderDiagramUpdateRef(this.spiderDiagramUpdateRef + 1);
+    }, 100);
+  },
   computed: {
     currentTastingCategoryName() {
       return this.categoriesRef[this.currentCategoryIndex]

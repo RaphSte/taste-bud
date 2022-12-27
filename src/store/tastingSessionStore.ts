@@ -1,5 +1,4 @@
 import {defineStore} from 'pinia'
-import {TasteRating} from "@/types/TastingSessionConfiguration";
 
 export const useTastingSessionStore = defineStore('tastingSessionStore', {
     state: () => ({
@@ -20,8 +19,3 @@ export const useTastingSessionStore = defineStore('tastingSessionStore', {
         }
     },
 })
-
-// tastingItems: [{
-//     tastingItemName: 'string',
-//     ratings: [],
-// }],

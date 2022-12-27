@@ -122,11 +122,7 @@ export function tasteRatingExistsFor(tastingItemName: string, tastingCategoryNam
 export function getTastedItemsFromStore(): Map<string, any> {
     const userStore = useUserStore();
     const tastingSessionStore = useTastingSessionStore();
-
     const session = tastingSessionStore.tastingSession;
-
-    console.log("loading session" + JSON.stringify(session))
-
     const items = JSON.parse(JSON.stringify(session.tastingItems));
 
     const tastedItemsMap = new Map<string, TasteRating>();

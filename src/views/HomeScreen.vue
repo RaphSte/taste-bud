@@ -1,5 +1,5 @@
 <template>
-  <ion-page>
+  <ion-page class="background-image">
     <ion-content>
       <ion-item>
         <ion-text class="ion-text-center">

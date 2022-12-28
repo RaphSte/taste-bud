@@ -1,3 +1,7 @@
+.background-image {
+    background: url(/public/img/dirty-try.png) 0 0/100% 100% no-repeat;
+}
+
 
 .bg-transparent {
     background: transparent;

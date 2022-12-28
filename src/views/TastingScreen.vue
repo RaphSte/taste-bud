@@ -14,7 +14,7 @@
       <Transition :name="transitionEnabled? animationType: Animation.NoAnimation">
         <div v-if="!transitioning">
           <ion-item class="ion-padding-bottom">
-            <ion-text class="ion-text-center">
+            <ion-text class="ion-text-center text-container">
               <div v-if="currentCategoryIndex !== categoriesRef.length">
                 <h1>{{ categoriesRef[currentCategoryIndex] }}-ness</h1>
                 <p>
@@ -57,7 +57,7 @@
               <div class="slider-style">
                 <vue3-slider
                     v-model="sliderValue"
-                    color="#b2583c"
+                    :color="colors.primary"
                     track-color="grey"
                     :step="1"
                     :min="0"
@@ -140,6 +140,7 @@ import {
   tasteRatingExistsFor
 } from "@/util/Utils";
 import {TasteRating} from "@/types/TastingSessionConfiguration";
+import {getColors} from "@/util/Color";
 
 export default defineComponent({
   name: "TastingScreen",
@@ -199,6 +200,7 @@ export default defineComponent({
     }
 
     const userId = loadOrCreateUserId();
+    const colors = getColors();
 
     return {
       seriesRef,
@@ -217,6 +219,7 @@ export default defineComponent({
       toastSetOpen,
       submittingRatings,
       setSubmittingRatings,
+      colors
     }
   },
   data(props) {
@@ -360,6 +363,10 @@ export default defineComponent({
 .spider-diagram {
   margin-bottom: -40px;
   margin-top: -15px;
+}
+
+.text-container {
+  width: 100%;
 }
 
 </style>

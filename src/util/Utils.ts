@@ -370,3 +370,13 @@ export function calculateAverage(numbers: number[]): number {
     const sum = numbers.reduce((a, b) => a + b, 0);
     return (sum / numbers.length) || 0;
 }
+
+export function extractTotalTateReviewsForItem(tastingSession: any, tastingItem: string): number {
+    return Object.keys(tastingSession.tastingItems[tastingItem].ratings).length;
+}
+
+export function extractAverageForItem(tastingSession: any, tastingItem: string): any {
+    if (!tastingSession.tastingItems[tastingItem].score) return 0
+    const numberArray = Object.entries(tastingSession.tastingItems[tastingItem].score).map((item) => item[1])
+    return calculateAverage(numberArray as number[])
+}

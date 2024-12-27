@@ -46,6 +46,7 @@
                 :categories="categoriesRef"
                 :series-data="userRatingSeries"
                 :show-data-labels="showDataLabels"
+                :show-toolbar="true"
                 :show-yaxis-labels="showYAxisDataLabels"
                 :key="spiderDiagramUpdateRef"
             />

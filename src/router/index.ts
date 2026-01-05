@@ -1,6 +1,8 @@
 import {createRouter, createWebHistory} from '@ionic/vue-router';
 import {RouteRecordRaw} from 'vue-router';
 import HomeScreen from "@/views/HomeScreen.vue";
+import {getSessionKeyFromPreferences} from "@/controller/LocalStorage";
+import {fetchTastingSessionAndSaveToLocalStorage} from "@/util/Utils";
 
 
 const routes: Array<RouteRecordRaw> = [
@@ -56,9 +58,23 @@ const routes: Array<RouteRecordRaw> = [
 ]
 
 const router = createRouter({
-    history: createWebHistory(process.env.BASE_URL),
+    history: createWebHistory(import.meta.env.BASE_URL),
     routes
 })
+
+router.beforeEach(async (to, from) => {
+    // Refresh session from Firestore if navigating to session-related routes
+    if (to.path.startsWith('/session/') || to.path.startsWith('/success/')) {
+        try {
+            const sessionKey = await getSessionKeyFromPreferences();
+            if (sessionKey) {
+                await fetchTastingSessionAndSaveToLocalStorage(sessionKey);
+            }
+        } catch (error) {
+            // No session key - user not in a session, continue navigation
+        }
+    }
+});
 
 router.afterEach((to, from) => {
     const toDepth = to.path.substring(1).split('/').length

@@ -44,7 +44,7 @@ export function loadOrCreateUserId(): Ref<string> {
 
 export async function fetchTastingSessionAndSaveToLocalStorage(sessionCode: string): Promise<TastingSession> {
     return fetchTastingSession(sessionCode).then(sessionObject => {
-        setTastingSessionToPreferences(sessionObject).then(r => console.log("tasting session was set to storage"));
+        setTastingSessionToPreferences(sessionObject).then(() => console.log("tasting session was set to storage"));
         const tastingSessionStore = useTastingSessionStore();
         tastingSessionStore.$reset();
         tastingSessionStore.$patch({
@@ -55,6 +55,18 @@ export async function fetchTastingSessionAndSaveToLocalStorage(sessionCode: stri
     }).catch((err) => {
         return err;
     })
+}
+
+export async function refreshSessionFromFirestoreIfExists(): Promise<void> {
+    try {
+        const sessionKey = await getSessionKeyFromPreferences();
+        if (sessionKey) {
+            await fetchTastingSessionAndSaveToLocalStorage(sessionKey);
+        }
+    } catch (error) {
+        // No session key found or fetch failed - this is fine, user might not be in a session
+        console.log("No active session to refresh:", error);
+    }
 }
 
 export function extractTastingItemNamesFromObject(session: TastingSession): string[] {
@@ -115,7 +127,7 @@ export function tasteRatingExistsFor(tastingItemName: string, tastingCategoryNam
     const category = tastingItem.get(tastingCategoryName)
     const userStore = useUserStore();
 
-    return category?.ratedBy === userStore.userId ?? false
+    return category?.ratedBy === userStore.userId || false
 }
 
 

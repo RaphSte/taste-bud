@@ -3,7 +3,7 @@
     <!--    TODO evaluate if <ion-router-outlet /> can be replaced with vanilla router view without any mayor drawbacks-->
     <router-view v-slot="{ Component, route }">
       <transition :name="route.meta.transitionName">
-        <component :is="Component"/>
+        <component :is="Component" :key="route.path"/>
       </transition>
     </router-view>
 <!--    <ion-router-outlet />-->
@@ -11,7 +11,7 @@
 </template>
 
 <script lang="ts">
-import {IonApp, IonRouterOutlet} from '@ionic/vue';
+import {IonApp} from '@ionic/vue';
 import {defineComponent} from 'vue';
 
 export default defineComponent({

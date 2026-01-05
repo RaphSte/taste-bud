@@ -36,6 +36,10 @@
 
 
     <ion-content>
+      <ion-refresher slot="fixed" @ionRefresh="handleRefresh($event)">
+        <ion-refresher-content></ion-refresher-content>
+      </ion-refresher>
+      
       <swiper class="slide-container" :modules="modules" :pagination="true" :navigation="true">
 
         <swiper-slide>
@@ -60,6 +64,7 @@
                 :categories="categoriesRef"
                 :series-data="combinedRatingSeries"
                 :show-data-labels="showDataLabels"
+                :show-toolbar="true"
                 :show-yaxis-labels="showYAxisDataLabels"
                 :key="spiderDiagramUpdateRef"
             />
@@ -73,6 +78,7 @@
                 :categories="categoriesRef"
                 :series-data="averageRatingSeries"
                 :show-data-labels="showDataLabels"
+                :show-toolbar="true"
                 :show-yaxis-labels="showYAxisDataLabels"
                 :key="spiderDiagramUpdateRef"
             />
@@ -86,6 +92,7 @@
                 :categories="categoriesRef"
                 :series-data="medianRatingSeries"
                 :show-data-labels="showDataLabels"
+                :show-toolbar="true"
                 :show-yaxis-labels="showYAxisDataLabels"
                 :key="spiderDiagramUpdateRef"
             />
@@ -102,11 +109,12 @@
 import {defineComponent, ref} from "vue";
 import {chevronBack, chevronForward, chevronUp, close, ellipsisVertical, settings} from 'ionicons/icons';
 
-import {IonButton, IonContent, IonIcon, IonItem, IonLabel, IonPage, IonToggle} from "@ionic/vue";
+import {IonButton, IonContent, IonIcon, IonItem, IonLabel, IonPage, IonToggle, IonRefresher, IonRefresherContent} from "@ionic/vue";
 import HeaderComponent from "@/components/HeaderComponent.vue";
 import SpiderDiagram from "@/components/SpiderDiagram.vue";
 import {DiagramSeriesEntry} from "@/types/DiagramTypes";
 import {calculateAverage, calculateMedian, getConsolidatedRatings, getRatingMapForItemFromStore} from "@/util/Utils";
+import {useSessionRefresh} from "@/composables/useSessionRefresh";
 import {TasteRating} from "@/types/TastingSessionConfiguration";
 
 import 'swiper/css';
@@ -123,7 +131,16 @@ export default defineComponent({
     Swiper,
     SwiperSlide,
     SpiderDiagram,
-    HeaderComponent, IonPage, IonContent, IonLabel, IonToggle, IonItem, IonButton, IonIcon,
+    HeaderComponent, 
+    IonPage, 
+    IonContent, 
+    IonLabel, 
+    IonToggle, 
+    IonItem, 
+    IonButton, 
+    IonIcon,
+    IonRefresher,
+    IonRefresherContent
   },
   props: {
     evaluationItemName: {type: String, required: true},
@@ -138,62 +155,83 @@ export default defineComponent({
     const showYAxisDataLabels = ref(true);
     const setShowYAxisDataLabels = (state: boolean) => showYAxisDataLabels.value = state;
 
-    const consolidatedRatings = getConsolidatedRatings(props.evaluationItemName);
+    const { refreshSession } = useSessionRefresh();
 
-    const userRatingDataObject: DiagramSeriesEntry = {
-      name: "User Rating",
-      data: [],
-    }
+    const calculateSeriesData = () => {
+      const consolidatedRatings = getConsolidatedRatings(props.evaluationItemName);
 
-    const averageRatingDataObject: DiagramSeriesEntry = {
-      name: "Average",
-      data: [],
+      const userRatingDataObject: DiagramSeriesEntry = {
+        name: "User Rating",
+        data: [],
+      }
+
+      const averageRatingDataObject: DiagramSeriesEntry = {
+        name: "Average",
+        data: [],
+      };
+
+      const medianRatingDataObject: DiagramSeriesEntry = {
+        name: "Median",
+        data: [],
+      }
+
+      const categories: string[] = [];
+      const ratingMap = getRatingMapForItemFromStore(props.evaluationItemName);
+      ratingMap.forEach((value: TasteRating, key: string) => {
+        categories.push(key);
+        userRatingDataObject.data.push(value.rating)
+      });
+
+      const averageRatings: number[] = [];
+      const medianRatings: number[] = [];
+
+      categories.forEach((v: string) => {
+        averageRatings.push(calculateAverage(consolidatedRatings[v]));
+        medianRatings.push(calculateMedian(consolidatedRatings[v]));
+      })
+      averageRatingDataObject.data = averageRatings;
+      medianRatingDataObject.data = medianRatings;
+
+      return {
+        userRatingDataObject,
+        averageRatingDataObject,
+        medianRatingDataObject,
+        categories
+      };
     };
 
-    const medianRatingDataObject: DiagramSeriesEntry = {
-      name: "Median",
-      data: [],
-    }
+    const initialData = calculateSeriesData();
+    const categoriesRef = ref(initialData.categories);
 
-
-    let categories: string[] = [];
-    const categoriesRef = ref(categories);
-
-
-    const ratingMap = getRatingMapForItemFromStore(props.evaluationItemName);
-    ratingMap.forEach((value: TasteRating, key: string) => {
-      categoriesRef.value.push(key);
-      userRatingDataObject.data.push(value.rating)
-    });
-
-    const averageRatings: number[] = [];
-    const medianRatings: number[] = [];
-
-    categoriesRef.value.forEach((v: string) => {
-      averageRatings.push(calculateAverage(consolidatedRatings[v]));
-      medianRatings.push(calculateMedian(consolidatedRatings[v]));
-    })
-    averageRatingDataObject.data = averageRatings;
-    medianRatingDataObject.data = medianRatings;
-
-
-    const userRatingSeries = ref([
-      userRatingDataObject
-    ])
-
-    const averageRatingSeries = ref([
-      averageRatingDataObject,
-    ]);
-
-    const medianRatingSeries = ref([
-      medianRatingDataObject,
-    ]);
-
+    const userRatingSeries = ref([initialData.userRatingDataObject]);
+    const averageRatingSeries = ref([initialData.averageRatingDataObject]);
+    const medianRatingSeries = ref([initialData.medianRatingDataObject]);
     const combinedRatingSeries = ref([
-      userRatingDataObject,
-      averageRatingDataObject,
-      medianRatingDataObject,
+      initialData.userRatingDataObject,
+      initialData.averageRatingDataObject,
+      initialData.medianRatingDataObject,
     ]);
+
+    const handleRefresh = async (event: CustomEvent) => {
+      await refreshSession();
+      
+      // Recalculate data from updated store
+      const updatedData = calculateSeriesData();
+      categoriesRef.value = updatedData.categories;
+      userRatingSeries.value = [updatedData.userRatingDataObject];
+      averageRatingSeries.value = [updatedData.averageRatingDataObject];
+      medianRatingSeries.value = [updatedData.medianRatingDataObject];
+      combinedRatingSeries.value = [
+        updatedData.userRatingDataObject,
+        updatedData.averageRatingDataObject,
+        updatedData.medianRatingDataObject,
+      ];
+      
+      // Trigger chart re-render
+      setSpiderDiagramUpdateRef(spiderDiagramUpdateRef.value + 1);
+      
+      event.detail.complete();
+    };
 
     return {
       userRatingSeries,
@@ -207,6 +245,7 @@ export default defineComponent({
       setShowDataLabels,
       showYAxisDataLabels,
       setShowYAxisDataLabels,
+      handleRefresh,
       modules: [Pagination, Navigation],
     }
   },

@@ -4,6 +4,10 @@
         title="Selection"
     />
     <ion-content>
+      <ion-refresher slot="fixed" @ionRefresh="handleRefresh($event)">
+        <ion-refresher-content></ion-refresher-content>
+      </ion-refresher>
+      
       <ion-item class="ion-padding-bottom">
         <ion-text class="ion-text-center">
           <p>Choose the item of which you'd like to view the evaluation</p>
@@ -43,9 +47,9 @@
 </template>
 
 <script lang="ts">
-import {defineComponent} from "vue";
+import {defineComponent, computed} from "vue";
 import HeaderComponent from "@/components/HeaderComponent.vue";
-import {IonContent, IonIcon, IonItem, IonLabel, IonPage, IonText,} from "@ionic/vue";
+import {IonContent, IonIcon, IonItem, IonLabel, IonPage, IonText, IonRefresher, IonRefresherContent} from "@ionic/vue";
 import {useTastingSessionStore} from "@/store/tastingSessionStore";
 import {
   extractAverageForItem,
@@ -53,37 +57,58 @@ import {
   extractTotalTateReviewsForItem,
   getTastedItemsFromStore
 } from "@/util/Utils";
-import {TastingSession} from "@/types/TastingSessionConfiguration";
+import {useSessionRefresh} from "@/composables/useSessionRefresh";
 import {checkmarkDone, checkmarkSharp, chevronForward, list, people, podium} from 'ionicons/icons';
 
 export default defineComponent({
   name: 'EvaluationItemSelection',
-  components: {HeaderComponent, IonPage, IonText, IonItem, IonLabel, IonContent, IonIcon},
+  components: {
+    HeaderComponent, 
+    IonPage, 
+    IonText, 
+    IonItem, 
+    IonLabel, 
+    IonContent, 
+    IonIcon,
+    IonRefresher,
+    IonRefresherContent
+  },
   props: {},
   setup() {
     const tastingSessionStore = useTastingSessionStore();
+    const { refreshSession } = useSessionRefresh();
 
-    const tastingSession: TastingSession = tastingSessionStore.tastingSession
-    const tastingItems: string[] = extractTastingItemNamesFromObject(tastingSession);
-    const tastedItems: Map<string, any> = getTastedItemsFromStore();
+    const tastingSession = computed(() => tastingSessionStore.tastingSession);
+    const tastingItems = computed(() => extractTastingItemNamesFromObject(tastingSession.value));
+    const tastedItems = computed(() => getTastedItemsFromStore());
 
-    const getReviewCountFor = ((item: string) => extractTotalTateReviewsForItem(tastingSession, item))
-    const getAverageFor = ((item: string) => extractAverageForItem(tastingSession, item))
+    const getReviewCountFor = (item: string) => extractTotalTateReviewsForItem(tastingSession.value, item);
+    
+    const getAverageFor = (item: string) => {
+      const average = extractAverageForItem(tastingSession.value, item);
+      return Math.round(average * 10) / 10; // Round to 1 decimal place
+    };
 
-    const getStyleBasedOnRating = ((rating: number) => {
-      switch (true) {
-        case rating >= 7:
-          return "success";
-        case rating >= 4:
-          return "warning";
-        case rating > 0:
-          return "danger";
-        default:
-          return "medium";
-      }
-    });
+    const getStyleBasedOnRating = (rating: number) => {
+      if (rating >= 7) return "success";
+      if (rating >= 4) return "warning";
+      if (rating > 0) return "danger";
+      return "medium";
+    };
 
-    return {tastingItems, tastedItems, getReviewCountFor, getAverageFor, getStyleBasedOnRating}
+    const handleRefresh = async (event: CustomEvent) => {
+      await refreshSession();
+      event.detail.complete();
+    };
+
+    return {
+      tastingItems, 
+      tastedItems, 
+      getReviewCountFor, 
+      getAverageFor, 
+      getStyleBasedOnRating,
+      handleRefresh
+    };
   },
   data() {
     return {

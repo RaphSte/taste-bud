@@ -4,6 +4,10 @@
         title="Selection"
     />
     <ion-content>
+      <ion-refresher slot="fixed" @ionRefresh="handleRefresh($event)">
+        <ion-refresher-content></ion-refresher-content>
+      </ion-refresher>
+      
       <ion-item class="ion-padding-bottom">
         <ion-text class="ion-text-center">
           <p>Select the item, you'd like to taste!</p>
@@ -24,26 +28,42 @@
 </template>
 
 <script lang="ts">
-import {defineComponent} from "vue";
+import {defineComponent, computed} from "vue";
 import HeaderComponent from "@/components/HeaderComponent.vue";
-import {IonContent, IonIcon, IonItem, IonLabel, IonPage, IonText,} from "@ionic/vue";
+import {IonContent, IonIcon, IonItem, IonLabel, IonPage, IonText, IonRefresher, IonRefresherContent} from "@ionic/vue";
 import {useTastingSessionStore} from "@/store/tastingSessionStore";
 import {extractTastingItemNamesFromObject, getTastedItemsFromStore} from "@/util/Utils";
-import {TastingSession} from "@/types/TastingSessionConfiguration";
+import {useSessionRefresh} from "@/composables/useSessionRefresh";
 import {checkmarkDoneSharp, checkmarkSharp, chevronForward,} from 'ionicons/icons';
 
 export default defineComponent({
   name: "TastingItemSelection",
-  components: {HeaderComponent, IonPage, IonText, IonItem, IonLabel, IonContent, IonIcon},
+  components: {
+    HeaderComponent, 
+    IonPage, 
+    IonText, 
+    IonItem, 
+    IonLabel, 
+    IonContent, 
+    IonIcon,
+    IonRefresher,
+    IonRefresherContent
+  },
   props: {},
   setup() {
     const tastingSessionStore = useTastingSessionStore();
-    tastingSessionStore.$dispose()
-    const tastingSession: TastingSession = tastingSessionStore.tastingSession
-    const tastingItems: string[] = extractTastingItemNamesFromObject(tastingSession);
-    const tastedItems: Map<string, any> = getTastedItemsFromStore();
+    const { refreshSession } = useSessionRefresh();
 
-    return {tastingItems, tastedItems}
+    const tastingSession = computed(() => tastingSessionStore.tastingSession);
+    const tastingItems = computed(() => extractTastingItemNamesFromObject(tastingSession.value));
+    const tastedItems = computed(() => getTastedItemsFromStore());
+
+    const handleRefresh = async (event: CustomEvent) => {
+      await refreshSession();
+      event.detail.complete();
+    };
+
+    return {tastingItems, tastedItems, handleRefresh}
   },
   data() {
     return {

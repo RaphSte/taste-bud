@@ -84,12 +84,12 @@
         Join
       </ion-button>
     </ion-footer>
+    <ion-loading
+        :is-open="processingSessionCode"
+        message="Loading session data..."
+        :duration="3000"
+    />
   </ion-page>
-  <ion-loading
-      :is-open="processingSessionCode"
-      message="Loading session data..."
-      :duration="3000"
-  />
 </template>
 
 <script lang="ts">

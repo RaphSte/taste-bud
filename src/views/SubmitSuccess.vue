@@ -38,7 +38,7 @@
       >
       </ion-toast>
     </ion-content>
-    <ion-button  expand="block" color="primary" router-link="/">Finish</ion-button>
+    <ion-button  expand="block" color="primary" @click="goToHome">Finish</ion-button>
   </ion-page>
 </template>
 
@@ -75,6 +75,9 @@ export default defineComponent({
       await Clipboard.write({
         string: text
       });
+    },
+    goToHome() {
+      this.$router.push('/');
     },
   },
 });
